@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --wg-white: #ffffff;
+  --wg-purple: #7159e9;
+  --wg-pink: #e66aaf;
+  --wg-graphite: #211b3a;
+  --wg-graphite-soft: #2c2548;
+  --wg-graphite-muted: #3a3258;
+  --wg-surface: #f6f4fb;
+  --wg-surface-elevated: #ffffff;
+  --wg-text: #211b3a;
+  --wg-text-muted: #6b6585;
+  --wg-border: #e6e2f2;
+  --wg-success: #2f9e6b;
+  --wg-warning: #c9851a;
+  --background: var(--wg-surface);
+  --foreground: var(--wg-text);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-wg-white: var(--wg-white);
+  --color-wg-purple: var(--wg-purple);
+  --color-wg-pink: var(--wg-pink);
+  --color-wg-graphite: var(--wg-graphite);
+  --color-wg-graphite-soft: var(--wg-graphite-soft);
+  --color-wg-graphite-muted: var(--wg-graphite-muted);
+  --color-wg-surface: var(--wg-surface);
+  --color-wg-surface-elevated: var(--wg-surface-elevated);
+  --color-wg-text: var(--wg-text);
+  --color-wg-text-muted: var(--wg-text-muted);
+  --color-wg-border: var(--wg-border);
+  --color-wg-success: var(--wg-success);
+  --color-wg-warning: var(--wg-warning);
+  --font-sans: var(--font-plus-jakarta);
+  --font-display: var(--font-sora);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-plus-jakarta), sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--wg-purple) 28%, white);
+  color: var(--wg-graphite);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.55s ease-out both;
+}
+
+.animate-fade-up-delay-1 {
+  animation: fade-up 0.55s ease-out 0.08s both;
+}
+
+.animate-fade-up-delay-2 {
+  animation: fade-up 0.55s ease-out 0.16s both;
+}
+
+.animate-fade-up-delay-3 {
+  animation: fade-up 0.55s ease-out 0.24s both;
+}
+
+.panel-atmosphere {
+  background:
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--wg-pink) 14%, transparent), transparent 32%),
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--wg-purple) 16%, transparent), transparent 36%),
+    linear-gradient(180deg, #f8f6fc 0%, #f3f0fa 48%, #f7f5fc 100%);
 }
