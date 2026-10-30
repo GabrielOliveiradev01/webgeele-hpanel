@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Painel autenticado com cookies/Supabase: modo clássico evita erros de prerender.
   turbopack: {
     rules: {
       "*.css": {

@@ -1,15 +1,14 @@
 import type { NavItem } from "@/lib/nav";
 import {
-  Building2,
   CircleHelp,
   CreditCard,
   Gauge,
   Globe2,
+  Inbox,
   LayoutDashboard,
   Network,
   Package,
   ShieldCheck,
-  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -18,12 +17,11 @@ const iconMap: Record<NavItem["icon"], LucideIcon> = {
   services: Package,
   domains: Globe2,
   dns: Network,
+  mailboxes: Inbox,
   account: ShieldCheck,
   plan: Gauge,
   billing: CreditCard,
   support: CircleHelp,
-  business: Building2,
-  directory: UsersRound,
 };
 
 export function NavIcon({
