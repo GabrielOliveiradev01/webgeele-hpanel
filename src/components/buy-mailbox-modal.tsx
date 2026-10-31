@@ -54,8 +54,8 @@ export function BuyMailboxModal({
         className="absolute inset-0 bg-black/35"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_24px_60px_rgba(16,24,40,0.18)]">
-        <div className="flex items-start justify-between border-b border-black/[0.06] px-5 py-4">
+      <div className="relative w-full max-w-xl overflow-hidden wg-card shadow-[0_24px_60px_rgba(16,24,40,0.18)]">
+        <div className="flex items-start justify-between border-b border-wg-border px-5 py-4">
           <div>
             <h2 className="font-display text-lg font-semibold text-wg-graphite">
               Escolher plano de e-mail
@@ -84,8 +84,8 @@ export function BuyMailboxModal({
                   onClick={() => setPlanCode(plan.code)}
                   className={`rounded-xl border px-4 py-3 text-left ${
                     selected
-                      ? "border-wg-graphite bg-wg-graphite text-white"
-                      : "border-black/[0.08] bg-white text-wg-graphite"
+                      ? "border-wg-graphite bg-wg-brand text-white"
+                      : "border-wg-border bg-white text-wg-graphite"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -114,7 +114,7 @@ export function BuyMailboxModal({
               className={`rounded-xl border px-3 py-2.5 text-sm font-medium ${
                 cycle === "monthly"
                   ? "border-wg-graphite bg-[#f3f3f4] text-wg-graphite"
-                  : "border-black/[0.08] text-wg-text-muted"
+                  : "border-wg-border text-wg-text-muted"
               }`}
             >
               Mensal
@@ -125,7 +125,7 @@ export function BuyMailboxModal({
               className={`rounded-xl border px-3 py-2.5 text-sm font-medium ${
                 cycle === "annual"
                   ? "border-wg-graphite bg-[#f3f3f4] text-wg-graphite"
-                  : "border-black/[0.08] text-wg-text-muted"
+                  : "border-wg-border text-wg-text-muted"
               }`}
             >
               Anual
@@ -140,11 +140,11 @@ export function BuyMailboxModal({
               max={50}
               value={quantity}
               onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
-              className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+              className="w-full wg-input"
             />
           </label>
 
-          <div className="rounded-xl bg-[#fafafa] px-4 py-3 text-sm text-wg-text-muted">
+          <div className="wg-stat text-sm text-wg-text-muted">
             <p>
               Total: <strong className="text-wg-graphite">{totals.totalLabel}</strong> /{" "}
               {totals.periodLabel}
@@ -158,7 +158,7 @@ export function BuyMailboxModal({
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-black/[0.06] px-5 py-4">
+        <div className="flex justify-end gap-2 border-t border-wg-border px-5 py-4">
           <button
             type="button"
             onClick={onClose}
@@ -169,7 +169,7 @@ export function BuyMailboxModal({
           <button
             type="button"
             onClick={goCheckout}
-            className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white"
+            className="wg-btn"
           >
             Ir para o checkout
           </button>

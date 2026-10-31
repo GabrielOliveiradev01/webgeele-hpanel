@@ -85,13 +85,13 @@ export function MailboxesPanel({
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
+        <div className="wg-card p-5 shadow-sm">
           <p className="text-xs font-medium tracking-wide text-wg-text-muted uppercase">Uso</p>
           <p className="mt-2 font-display text-2xl font-semibold text-wg-graphite">
             {used} / {max}
           </p>
         </div>
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
+        <div className="wg-card p-5 shadow-sm">
           <p className="text-xs font-medium tracking-wide text-wg-text-muted uppercase">
             Assinaturas
           </p>
@@ -100,7 +100,7 @@ export function MailboxesPanel({
           </p>
           <p className="mt-1 text-xs text-wg-text-muted">Caixas contratadas no Assas</p>
         </div>
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
+        <div className="wg-card p-5 shadow-sm">
           <p className="text-xs font-medium tracking-wide text-wg-text-muted uppercase">
             Armazenamento
           </p>
@@ -111,7 +111,7 @@ export function MailboxesPanel({
             Start 2GB · Business 5GB · Pro 15GB
           </p>
         </div>
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
+        <div className="wg-card p-5 shadow-sm">
           <p className="text-xs font-medium tracking-wide text-wg-text-muted uppercase">
             Disponíveis
           </p>
@@ -121,7 +121,7 @@ export function MailboxesPanel({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 wg-card p-5 shadow-sm">
         <div>
           <h2 className="font-display text-lg font-semibold text-wg-graphite">
             Assinar caixas de entrada
@@ -133,13 +133,13 @@ export function MailboxesPanel({
         <button
           type="button"
           onClick={() => setBuyOpen(true)}
-          className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white"
+          className="wg-btn"
         >
           Comprar caixas
         </button>
       </div>
 
-      <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm">
+      <div className="wg-card p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-display text-lg font-semibold text-wg-graphite">
@@ -153,7 +153,7 @@ export function MailboxesPanel({
             href={webmailUrl}
             target="_blank"
             rel="noreferrer"
-            className="rounded-xl border border-black/[0.08] px-4 py-2.5 text-sm font-medium text-wg-graphite"
+            className="wg-btn-secondary"
           >
             Abrir webmail
           </a>
@@ -165,14 +165,14 @@ export function MailboxesPanel({
             value={localPart}
             onChange={(e) => setLocalPart(e.target.value.replace(/[^a-zA-Z0-9._-]/g, ""))}
             disabled={domains.length === 0}
-            className="rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5 text-sm disabled:opacity-50"
+            className="wg-input disabled:opacity-50"
           />
           <select
             required
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             disabled={domains.length === 0}
-            className="rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5 text-sm disabled:opacity-50"
+            className="wg-input disabled:opacity-50"
           >
             {domains.length === 0 ? (
               <option value="">Cadastre um domínio primeiro</option>
@@ -188,12 +188,12 @@ export function MailboxesPanel({
             placeholder="Senha (opcional)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5 text-sm"
+            className="wg-input"
           />
           <button
             type="submit"
             disabled={loading || !emailPreview || !canCreate}
-            className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            className="wg-btn disabled:opacity-50"
           >
             {loading ? "Criando..." : "Criar"}
           </button>
@@ -211,17 +211,17 @@ export function MailboxesPanel({
       </div>
 
       {error ? (
-        <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+        <p className="wg-alert-error">{error}</p>
       ) : null}
       {createdPassword ? (
-        <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+        <p className="wg-alert-success">
           Caixa criada. Senha: <strong>{createdPassword}</strong>
         </p>
       ) : null}
 
-      <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+      <div className="overflow-hidden wg-card">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-black/[0.06] bg-[#fafafa] text-wg-text-muted">
+          <thead className="wg-table-head">
             <tr>
               <th className="px-4 py-3 font-medium">E-mail</th>
               <th className="px-4 py-3 font-medium">Status</th>
@@ -237,7 +237,7 @@ export function MailboxesPanel({
               </tr>
             ) : (
               mailboxes.map((mailbox) => (
-                <tr key={mailbox.id} className="border-b border-black/[0.04] last:border-0">
+                <tr key={mailbox.id} className="border-b border-wg-border/60 last:border-0">
                   <td className="px-4 py-3 font-medium text-wg-graphite">{mailbox.email}</td>
                   <td className="px-4 py-3">Ativo</td>
                   <td className="px-4 py-3">

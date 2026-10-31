@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createAsaasClient } from "@/lib/asaas/client";
 import { getAccountEntitlement } from "@/lib/billing/entitlements";
 import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
 
 export const metadata: Metadata = { title: "Financeiro" };
 
@@ -81,20 +82,18 @@ export default async function FinanceiroPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-wg-border bg-white p-5">
+        <div className="wg-card p-5">
           <p className="text-xs uppercase text-wg-text-muted">Conta</p>
-          <p className="mt-2 font-display text-xl font-semibold">{account?.status ?? "—"}</p>
+          <div className="mt-3"><StatusBadge status={account?.status} /></div>
         </div>
-        <div className="rounded-2xl border border-wg-border bg-white p-5">
+        <div className="wg-card p-5">
           <p className="text-xs uppercase text-wg-text-muted">Assinatura</p>
-          <p className="mt-2 font-display text-xl font-semibold">
-            {subscription?.status ?? "—"}
-          </p>
+          <div className="mt-3"><StatusBadge status={subscription?.status} /></div>
           <p className="text-sm text-wg-text-muted">
             {subscription?.plan?.name ?? entitlement?.planName ?? "Sem plano"}
           </p>
         </div>
-        <div className="rounded-2xl border border-wg-border bg-white p-5">
+        <div className="wg-card p-5">
           <p className="text-xs uppercase text-wg-text-muted">Acesso</p>
           <p className="mt-2 font-display text-xl font-semibold">
             {entitlement?.entitled ? "Ativo" : "—"}
@@ -102,12 +101,12 @@ export default async function FinanceiroPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-wg-border bg-white">
+      <div className="overflow-hidden wg-card">
         <div className="border-b border-wg-border px-4 py-3">
           <h2 className="font-display text-lg font-semibold">Pedidos do painel</h2>
         </div>
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-wg-border bg-wg-surface/70 text-wg-text-muted">
+          <thead className="wg-table-head">
             <tr>
               <th className="px-4 py-3">Tipo</th>
               <th className="px-4 py-3">Qtd</th>
@@ -134,14 +133,14 @@ export default async function FinanceiroPage() {
                       currency: "BRL",
                     })}
                   </td>
-                  <td className="px-4 py-3">{order.status}</td>
+                  <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                   <td className="px-4 py-3">
                     {order.invoice_url ? (
                       <a
                         href={order.invoice_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-medium text-wg-purple"
+                        className="font-medium text-wg-brand"
                       >
                         Abrir
                       </a>
@@ -156,12 +155,12 @@ export default async function FinanceiroPage() {
         </table>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-wg-border bg-white">
+      <div className="overflow-hidden wg-card">
         <div className="border-b border-wg-border px-4 py-3">
           <h2 className="font-display text-lg font-semibold">Cobranças da assinatura</h2>
         </div>
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-wg-border bg-wg-surface/70 text-wg-text-muted">
+          <thead className="wg-table-head">
             <tr>
               <th className="px-4 py-3">Vencimento</th>
               <th className="px-4 py-3">Valor</th>
@@ -186,14 +185,14 @@ export default async function FinanceiroPage() {
                       currency: "BRL",
                     })}
                   </td>
-                  <td className="px-4 py-3">{payment.status}</td>
+                  <td className="px-4 py-3"><StatusBadge status={payment.status} /></td>
                   <td className="px-4 py-3">
                     {payment.invoiceUrl || payment.bankSlipUrl ? (
                       <a
                         href={payment.invoiceUrl || payment.bankSlipUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-medium text-wg-purple"
+                        className="font-medium text-wg-brand"
                       >
                         Abrir
                       </a>

@@ -5,6 +5,7 @@ import { getAccountEntitlement } from "@/lib/billing/entitlements";
 import { listAccountMailboxes } from "@/lib/mailboxes/service";
 import { listDomains } from "@/lib/domains/service";
 import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
 
 export const metadata: Metadata = { title: "Meus serviços" };
 
@@ -75,15 +76,13 @@ export default async function ServicosPage() {
           <Link
             key={service.name}
             href={service.href}
-            className="rounded-2xl border border-wg-border bg-white p-5 transition hover:border-wg-purple/40"
+            className="wg-card p-5 transition hover:border-wg-brand/40"
           >
             <div className="flex items-start justify-between gap-3">
               <h2 className="font-display text-lg font-semibold text-wg-graphite">
                 {service.name}
               </h2>
-              <span className="rounded-full bg-wg-surface px-2.5 py-1 text-xs font-medium text-wg-graphite">
-                {service.status}
-              </span>
+              <StatusBadge status={service.status} />
             </div>
             <p className="mt-2 text-sm text-wg-text-muted">{service.detail}</p>
           </Link>

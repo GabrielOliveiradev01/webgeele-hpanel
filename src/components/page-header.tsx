@@ -10,13 +10,13 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="animate-fade-up mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-2xl">
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-wg-graphite sm:text-[2rem]">
+        <h1 className="font-display text-[1.75rem] font-semibold tracking-tight text-wg-graphite sm:text-[2rem]">
           {title}
         </h1>
         {description ? (
-          <p className="mt-2 text-[15px] leading-relaxed text-wg-text-muted">
+          <p className="mt-1.5 text-[15px] leading-relaxed text-wg-text-muted">
             {description}
           </p>
         ) : null}

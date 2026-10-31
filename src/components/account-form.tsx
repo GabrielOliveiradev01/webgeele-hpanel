@@ -47,7 +47,7 @@ export function AccountForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-xl space-y-4 rounded-2xl border border-wg-border bg-white p-6">
+    <form onSubmit={onSubmit} className="max-w-xl space-y-4 wg-card p-6">
       {[
         ["legal_name", "Nome / Razão social"],
         ["trade_name", "Nome fantasia"],
@@ -60,17 +60,17 @@ export function AccountForm({
           <input
             value={form[key as keyof typeof form]}
             onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-            className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+            className="w-full wg-input"
           />
         </label>
       ))}
-      {error ? <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="wg-alert-error">{error}</p> : null}
       {message ? (
-        <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{message}</p>
+        <p className="wg-alert-success">{message}</p>
       ) : null}
       <button
         disabled={loading}
-        className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+        className="wg-btn disabled:opacity-50"
       >
         {loading ? "Salvando..." : "Salvar conta"}
       </button>

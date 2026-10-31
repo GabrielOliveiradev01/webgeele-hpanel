@@ -57,6 +57,10 @@ export async function getAccountEntitlement(
     : subscription?.plan;
 
   const mailboxSlots = normalizeMailboxSlots(account.mailbox_slots);
+  // Compras anteriores aos slots por plano só somavam extra_mailboxes; contam como Start,
+  // o mesmo plano padrão usado quando o pedido não informa planCode.
+  const legacyMailboxes = (account.extra_mailboxes ?? 0) - totalMailboxSlots(mailboxSlots);
+  if (legacyMailboxes > 0) mailboxSlots.start += legacyMailboxes;
   const slotsTotal = totalMailboxSlots(mailboxSlots);
   const extraMailboxes = Math.max(account.extra_mailboxes ?? 0, slotsTotal);
   const maxMailboxes = extraMailboxes;

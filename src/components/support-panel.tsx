@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { StatusBadge } from "@/components/status-badge";
 
 type Ticket = {
   id: string;
@@ -42,14 +43,14 @@ export function SupportPanel({ tickets }: { tickets: Ticket[] }) {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-wg-border bg-white p-6">
+      <form onSubmit={onSubmit} className="space-y-3 wg-card p-6">
         <h2 className="font-display text-lg font-semibold text-wg-graphite">Novo chamado</h2>
         <input
           required
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           placeholder="Assunto"
-          className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+          className="w-full wg-input"
         />
         <textarea
           required
@@ -57,29 +58,29 @@ export function SupportPanel({ tickets }: { tickets: Ticket[] }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Descreva sua solicitação"
-          className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+          className="w-full wg-input"
         />
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+          className="wg-input"
         >
           <option value="low">Baixa</option>
           <option value="normal">Normal</option>
           <option value="high">Alta</option>
         </select>
-        {error ? <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+        {error ? <p className="wg-alert-error">{error}</p> : null}
         <button
           disabled={loading}
-          className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+          className="wg-btn disabled:opacity-50"
         >
           {loading ? "Enviando..." : "Abrir chamado"}
         </button>
       </form>
 
-      <div className="overflow-hidden rounded-2xl border border-wg-border bg-white">
+      <div className="overflow-hidden wg-card">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-wg-border bg-wg-surface/70 text-wg-text-muted">
+          <thead className="wg-table-head">
             <tr>
               <th className="px-4 py-3">Assunto</th>
               <th className="px-4 py-3">Prioridade</th>
@@ -102,7 +103,7 @@ export function SupportPanel({ tickets }: { tickets: Ticket[] }) {
                     <p className="text-wg-text-muted">{ticket.message}</p>
                   </td>
                   <td className="px-4 py-3">{ticket.priority}</td>
-                  <td className="px-4 py-3">{ticket.status}</td>
+                  <td className="px-4 py-3"><StatusBadge status={ticket.status} /></td>
                   <td className="px-4 py-3">
                     {new Date(ticket.created_at).toLocaleString("pt-BR")}
                   </td>

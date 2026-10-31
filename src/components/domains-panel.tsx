@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { StatusBadge } from "@/components/status-badge";
 
 type Domain = {
   id: string;
@@ -120,7 +121,7 @@ export function DomainsPanel({
             onClick={() => setTab(key as typeof tab)}
             className={`rounded-xl px-3.5 py-2 text-sm font-medium ${
               tab === key
-                ? "bg-wg-graphite text-white"
+                ? "bg-wg-brand text-white"
                 : "border border-wg-border bg-white text-wg-graphite"
             }`}
           >
@@ -129,7 +130,7 @@ export function DomainsPanel({
         ))}
       </div>
 
-      <div className="rounded-2xl border border-wg-border bg-white p-4 text-sm text-wg-text-muted">
+      <div className="wg-card p-4 text-sm text-wg-text-muted">
         Domínios na conta:{" "}
         <strong className="text-wg-graphite">{domains.length}</strong>
         {maxDomains == null ? " · sem limite" : ` / ${maxDomains}`}. A cada domínio
@@ -137,7 +138,7 @@ export function DomainsPanel({
       </div>
 
       {suggestedDns.length > 0 ? (
-        <div className="rounded-2xl border border-wg-purple/30 bg-white p-6 shadow-[0_10px_30px_rgba(113,89,233,0.08)]">
+        <div className="rounded-2xl border border-wg-brand/30 bg-white p-6 shadow-[0_10px_30px_rgba(102,60,230,0.10)]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="font-display text-lg font-semibold text-wg-graphite">
@@ -158,7 +159,7 @@ export function DomainsPanel({
               </button>
               <Link
                 href="/dns"
-                className="rounded-xl bg-wg-graphite px-3.5 py-2 text-sm font-medium text-white"
+                className="wg-btn px-3.5 py-2"
               >
                 Abrir gerenciador DNS
               </Link>
@@ -194,9 +195,9 @@ export function DomainsPanel({
       ) : null}
 
       {tab === "list" ? (
-        <div className="overflow-hidden rounded-2xl border border-wg-border bg-white">
+        <div className="overflow-hidden wg-card">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-wg-border bg-wg-surface/70 text-wg-text-muted">
+            <thead className="wg-table-head">
               <tr>
                 <th className="px-4 py-3">Domínio</th>
                 <th className="px-4 py-3">Origem</th>
@@ -217,7 +218,10 @@ export function DomainsPanel({
                     <td className="px-4 py-3 font-medium text-wg-graphite">{domain.name}</td>
                     <td className="px-4 py-3">{domain.source}</td>
                     <td className="px-4 py-3">
-                      {domain.status === "pending" ? "Aguardando DNS" : domain.status}
+                      <StatusBadge
+                        status={domain.status}
+                        label={domain.status === "pending" ? "Aguardando DNS" : undefined}
+                      />
                     </td>
                     <td className="px-4 py-3 text-wg-text-muted">
                       {(domain.nameservers || []).join(", ") || "—"}
@@ -236,7 +240,7 @@ export function DomainsPanel({
             e.preventDefault();
             submit("add_external");
           }}
-          className="space-y-3 rounded-2xl border border-wg-border bg-white p-6"
+          className="space-y-3 wg-card p-6"
         >
           <h2 className="font-display text-lg font-semibold">Trazer domínio existente</h2>
           <p className="text-sm text-wg-text-muted">
@@ -248,11 +252,11 @@ export function DomainsPanel({
             placeholder="empresa.com.br"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+            className="w-full wg-input"
           />
           <button
             disabled={loading}
-            className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            className="wg-btn disabled:opacity-50"
           >
             {loading ? "Gerando DNS..." : "Adicionar e gerar DNS"}
           </button>
@@ -265,7 +269,7 @@ export function DomainsPanel({
             e.preventDefault();
             submit(tab === "register" ? "register" : "transfer");
           }}
-          className="space-y-3 rounded-2xl border border-wg-border bg-white p-6"
+          className="space-y-3 wg-card p-6"
         >
           <h2 className="font-display text-lg font-semibold">
             {tab === "register" ? "Registrar novo domínio" : "Transferir domínio"}
@@ -279,7 +283,7 @@ export function DomainsPanel({
             placeholder="novodominio.com.br"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+            className="w-full wg-input"
           />
           {tab === "transfer" ? (
             <input
@@ -287,12 +291,12 @@ export function DomainsPanel({
               placeholder="Código EPP / Auth Code"
               value={authCode}
               onChange={(e) => setAuthCode(e.target.value)}
-              className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+              className="w-full wg-input"
             />
           ) : null}
           <button
             disabled={loading}
-            className="rounded-xl bg-gradient-to-r from-wg-purple to-wg-pink px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            className="wg-btn disabled:opacity-50"
           >
             {loading ? "Processando..." : "Continuar"}
           </button>
@@ -302,7 +306,7 @@ export function DomainsPanel({
       {tab === "manage" ? (
         <form
           onSubmit={saveNameservers}
-          className="space-y-3 rounded-2xl border border-wg-border bg-white p-6"
+          className="space-y-3 wg-card p-6"
         >
           <h2 className="font-display text-lg font-semibold">Gerenciar nameservers</h2>
           {domains.length === 0 ? (
@@ -316,7 +320,7 @@ export function DomainsPanel({
                   const current = domains.find((d) => d.id === e.target.value);
                   setNameservers((current?.nameservers || []).join("\n"));
                 }}
-                className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+                className="w-full wg-input"
               >
                 {domains.map((domain) => (
                   <option key={domain.id} value={domain.id}>
@@ -329,11 +333,11 @@ export function DomainsPanel({
                 placeholder={"ns1.webgeele.com.br\nns2.webgeele.com.br"}
                 value={nameservers}
                 onChange={(e) => setNameservers(e.target.value)}
-                className="w-full rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+                className="w-full wg-input"
               />
               <button
                 disabled={loading || !selectedId}
-                className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+                className="wg-btn disabled:opacity-50"
               >
                 Salvar nameservers
               </button>
@@ -342,8 +346,8 @@ export function DomainsPanel({
         </form>
       ) : null}
 
-      {error ? <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
-      {info ? <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{info}</p> : null}
+      {error ? <p className="wg-alert-error">{error}</p> : null}
+      {info ? <p className="wg-alert-success">{info}</p> : null}
     </div>
   );
 }

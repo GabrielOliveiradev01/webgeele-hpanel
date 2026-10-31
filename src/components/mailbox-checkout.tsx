@@ -126,7 +126,7 @@ export function MailboxCheckout({
 
   if (done) {
     return (
-      <div className="mx-auto max-w-xl rounded-2xl border border-black/[0.06] bg-white p-8 text-center shadow-sm">
+      <div className="mx-auto max-w-xl wg-card p-8 text-center shadow-sm">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
           ✓
         </div>
@@ -140,13 +140,13 @@ export function MailboxCheckout({
         <div className="mt-6 flex justify-center gap-2">
           <Link
             href="/caixas"
-            className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white"
+            className="wg-btn"
           >
             Criar e-mails
           </Link>
           <Link
             href="/financeiro"
-            className="rounded-xl border border-black/[0.08] px-4 py-2.5 text-sm font-medium text-wg-graphite"
+            className="wg-btn-secondary"
           >
             Financeiro
           </Link>
@@ -156,15 +156,15 @@ export function MailboxCheckout({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/[0.06] px-5 py-4 sm:px-8">
+    <div className="overflow-hidden wg-card">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-wg-border px-5 py-4 sm:px-8">
         <div className="flex items-center gap-2 text-sm">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-wg-graphite text-xs font-semibold text-white">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-wg-brand text-xs font-semibold text-white">
             1
           </span>
           <span className="text-wg-text-muted">Plano</span>
           <span className="text-wg-text-muted">/</span>
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-wg-graphite text-xs font-semibold text-white">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-wg-brand text-xs font-semibold text-white">
             2
           </span>
           <span className="font-medium text-wg-graphite">Pagamento</span>
@@ -180,7 +180,7 @@ export function MailboxCheckout({
       </div>
 
       <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
-        <form onSubmit={onSubmit} className="space-y-6 border-b border-black/[0.06] p-5 sm:p-8 lg:border-r lg:border-b-0">
+        <form onSubmit={onSubmit} className="space-y-6 border-b border-wg-border p-5 sm:p-8 lg:border-r lg:border-b-0">
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             Assinatura Assas · plano {plan.name} ·{" "}
             {cycle === "monthly" ? "mensal recorrente" : "cobrança única anual"} · só
@@ -198,7 +198,7 @@ export function MailboxCheckout({
                   required
                   value={holderName}
                   onChange={(e) => setHolderName(e.target.value)}
-                  className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                  className="w-full wg-input"
                 />
               </label>
               <label className="block text-sm">
@@ -206,7 +206,7 @@ export function MailboxCheckout({
                 <input
                   readOnly
                   value={account.email}
-                  className="w-full rounded-xl border border-black/[0.08] bg-[#f3f3f4] px-3 py-2.5 text-wg-text-muted"
+                  className="w-full wg-input bg-wg-surface text-wg-text-muted"
                 />
               </label>
               <label className="block text-sm">
@@ -214,7 +214,7 @@ export function MailboxCheckout({
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                  className="w-full wg-input"
                 />
               </label>
             </div>
@@ -233,7 +233,7 @@ export function MailboxCheckout({
                   autoComplete="cc-number"
                   value={cardNumber}
                   onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                  className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5 font-mono"
+                  className="w-full wg-input font-mono"
                   placeholder="•••• •••• •••• ••••"
                 />
               </label>
@@ -245,7 +245,7 @@ export function MailboxCheckout({
                     maxLength={2}
                     value={expiryMonth}
                     onChange={(e) => setExpiryMonth(onlyDigits(e.target.value).slice(0, 2))}
-                    className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                    className="w-full wg-input"
                     placeholder="MM"
                   />
                 </label>
@@ -256,7 +256,7 @@ export function MailboxCheckout({
                     maxLength={4}
                     value={expiryYear}
                     onChange={(e) => setExpiryYear(onlyDigits(e.target.value).slice(0, 4))}
-                    className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                    className="w-full wg-input"
                     placeholder="AAAA"
                   />
                 </label>
@@ -267,7 +267,7 @@ export function MailboxCheckout({
                     maxLength={4}
                     value={ccv}
                     onChange={(e) => setCcv(onlyDigits(e.target.value).slice(0, 4))}
-                    className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                    className="w-full wg-input"
                     placeholder="•••"
                   />
                 </label>
@@ -279,7 +279,7 @@ export function MailboxCheckout({
                     required
                     value={holderDoc}
                     onChange={(e) => setHolderDoc(e.target.value)}
-                    className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                    className="w-full wg-input"
                   />
                 </label>
                 <label className="block text-sm">
@@ -288,7 +288,7 @@ export function MailboxCheckout({
                     required
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
-                    className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                    className="w-full wg-input"
                   />
                 </label>
                 <label className="block text-sm">
@@ -297,7 +297,7 @@ export function MailboxCheckout({
                     required
                     value={addressNumber}
                     onChange={(e) => setAddressNumber(e.target.value)}
-                    className="w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5"
+                    className="w-full wg-input"
                   />
                 </label>
               </div>
@@ -305,7 +305,7 @@ export function MailboxCheckout({
           </section>
 
           {error ? (
-            <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+            <p className="wg-alert-error">{error}</p>
           ) : null}
 
           <label className="flex items-start gap-2 text-sm text-wg-text-muted">
@@ -321,7 +321,7 @@ export function MailboxCheckout({
           </label>
         </form>
 
-        <aside className="bg-[#fafafa] p-5 sm:p-8">
+        <aside className="bg-wg-surface/60 p-5 sm:p-8">
           <h2 className="font-display text-lg font-semibold text-wg-graphite">Resumo</h2>
           <dl className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between gap-3">
@@ -348,7 +348,7 @@ export function MailboxCheckout({
                 {quantity} × {plan.storageLabel}
               </dd>
             </div>
-            <div className="border-t border-black/[0.06] pt-3">
+            <div className="border-t border-wg-border pt-3">
               <div className="flex justify-between gap-3">
                 <dt className="text-wg-text-muted">Total</dt>
                 <dd className="font-display text-2xl font-semibold text-wg-graphite">

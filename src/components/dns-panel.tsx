@@ -66,12 +66,12 @@ export function DnsPanel({
     <div className="space-y-6">
       <form
         onSubmit={onCreate}
-        className="grid gap-3 rounded-2xl border border-wg-border bg-white p-6 md:grid-cols-6"
+        className="grid gap-3 wg-card p-6 md:grid-cols-6"
       >
         <select
           value={domainId}
           onChange={(e) => setDomainId(e.target.value)}
-          className="rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm md:col-span-2"
+          className="wg-input md:col-span-2"
         >
           {domains.map((domain) => (
             <option key={domain.id} value={domain.id}>
@@ -82,7 +82,7 @@ export function DnsPanel({
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+          className="wg-input"
         >
           {["A", "AAAA", "CNAME", "MX", "TXT", "NS", "SRV"].map((item) => (
             <option key={item}>{item}</option>
@@ -92,20 +92,20 @@ export function DnsPanel({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="nome"
-          className="rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+          className="wg-input"
         />
         <input
           required
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="valor"
-          className="rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm md:col-span-2"
+          className="wg-input md:col-span-2"
         />
         <input
           type="number"
           value={ttl}
           onChange={(e) => setTtl(Number(e.target.value))}
-          className="rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+          className="wg-input"
         />
         {(type === "MX" || type === "SRV") && (
           <input
@@ -113,22 +113,22 @@ export function DnsPanel({
             value={priority}
             onChange={(e) => setPriority(Number(e.target.value))}
             placeholder="prioridade"
-            className="rounded-xl border border-wg-border bg-wg-surface px-3 py-2.5 text-sm"
+            className="wg-input"
           />
         )}
         <button
           disabled={loading || !domainId}
-          className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50 md:col-span-2"
+          className="wg-btn disabled:opacity-50 md:col-span-2"
         >
           {loading ? "Salvando..." : "Adicionar registro"}
         </button>
       </form>
 
-      {error ? <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="wg-alert-error">{error}</p> : null}
 
-      <div className="overflow-hidden rounded-2xl border border-wg-border bg-white">
+      <div className="overflow-hidden wg-card">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-wg-border bg-wg-surface/70 text-wg-text-muted">
+          <thead className="wg-table-head">
             <tr>
               <th className="px-4 py-3">Domínio</th>
               <th className="px-4 py-3">Tipo</th>

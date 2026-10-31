@@ -4,10 +4,12 @@
   --wg-white: #ffffff;
   --wg-purple: #7159e9;
   --wg-pink: #e66aaf;
+  --wg-brand: #663ce6;
+  --wg-brand-dark: #5530d1;
   --wg-graphite: #211b3a;
   --wg-graphite-soft: #2c2548;
   --wg-graphite-muted: #3a3258;
-  --wg-surface: #f6f4fb;
+  --wg-surface: #f5f4fa;
   --wg-surface-elevated: #ffffff;
   --wg-text: #211b3a;
   --wg-text-muted: #6b6585;
@@ -24,6 +26,8 @@
   --color-wg-white: var(--wg-white);
   --color-wg-purple: var(--wg-purple);
   --color-wg-pink: var(--wg-pink);
+  --color-wg-brand: var(--wg-brand);
+  --color-wg-brand-dark: var(--wg-brand-dark);
   --color-wg-graphite: var(--wg-graphite);
   --color-wg-graphite-soft: var(--wg-graphite-soft);
   --color-wg-graphite-muted: var(--wg-graphite-muted);
@@ -97,4 +101,37 @@ body {
 
 .panel-atmosphere {
   background: #f4f4f5;
+}
+
+/* Componentes do painel */
+@utility wg-card {
+  @apply rounded-2xl border border-wg-border/70 bg-white shadow-[0_1px_2px_rgba(33,27,58,0.04),0_8px_24px_rgba(33,27,58,0.04)];
+}
+
+@utility wg-input {
+  @apply w-full rounded-xl border border-wg-border bg-white px-3.5 py-2.5 text-sm text-wg-graphite outline-none transition placeholder:text-wg-text-muted/60 hover:border-wg-brand/30 focus:border-wg-brand focus:ring-4 focus:ring-wg-brand/10;
+}
+
+@utility wg-btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-wg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(102,60,230,0.25)] transition hover:bg-wg-brand-dark disabled:opacity-50;
+}
+
+@utility wg-btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-wg-border bg-white px-4 py-2.5 text-sm font-semibold text-wg-graphite transition hover:border-wg-brand/30 hover:text-wg-brand disabled:opacity-50;
+}
+
+@utility wg-table-head {
+  @apply border-b border-wg-border bg-wg-surface/60 text-xs font-semibold tracking-wide text-wg-text-muted uppercase;
+}
+
+@utility wg-stat {
+  @apply rounded-xl border border-wg-border/70 bg-wg-surface/50 px-4 py-3;
+}
+
+@utility wg-alert-error {
+  @apply rounded-xl border border-red-100 bg-red-50 px-3.5 py-2.5 text-sm text-red-700;
+}
+
+@utility wg-alert-success {
+  @apply rounded-xl border border-emerald-100 bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-800;
 }

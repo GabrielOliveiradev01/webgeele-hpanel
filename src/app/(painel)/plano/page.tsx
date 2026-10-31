@@ -18,7 +18,7 @@ export default async function PlanoPage() {
         description="Caixas por assinatura Assas, armazenamento por quantidade de caixas e domínios ilimitados."
       />
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm">
+        <div className="wg-card p-6 shadow-sm">
           <p className="text-sm text-wg-text-muted">Caixas contratadas</p>
           <p className="mt-2 font-display text-3xl font-semibold text-wg-graphite">
             {entitlement?.usedMailboxes ?? 0} / {entitlement?.maxMailboxes ?? 0}
@@ -30,7 +30,7 @@ export default async function PlanoPage() {
             Comprar caixas
           </Link>
         </div>
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm">
+        <div className="wg-card p-6 shadow-sm">
           <p className="text-sm text-wg-text-muted">Armazenamento</p>
           <p className="mt-2 font-display text-3xl font-semibold text-wg-graphite">
             {entitlement?.usedStorageMb ?? 0} / {entitlement?.maxStorageMb ?? 0} MB
@@ -39,7 +39,7 @@ export default async function PlanoPage() {
             Soma do armazenamento das caixas contratadas
           </p>
         </div>
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm">
+        <div className="wg-card p-6 shadow-sm">
           <p className="text-sm text-wg-text-muted">Domínios</p>
           <p className="mt-2 font-display text-3xl font-semibold text-wg-graphite">
             {entitlement?.usedDomains ?? 0}
@@ -49,11 +49,11 @@ export default async function PlanoPage() {
             Gerenciar domínios
           </Link>
         </div>
-        <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm md:col-span-2">
+        <div className="wg-card p-6 shadow-sm md:col-span-2">
           <p className="text-sm text-wg-text-muted">Planos de caixa (Assas)</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {MAILBOX_PLANS.map((plan) => (
-              <div key={plan.code} className="rounded-xl bg-[#fafafa] px-4 py-3">
+              <div key={plan.code} className="wg-stat">
                 <p className="font-medium text-wg-graphite">{plan.name}</p>
                 <p className="mt-1 text-sm text-wg-text-muted">
                   {(plan.monthlyCents / 100).toLocaleString("pt-BR", {
