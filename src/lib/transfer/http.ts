@@ -27,15 +27,33 @@ export async function getOwnedAccount() {
   return { userId: user.id, accountId: account.id as string };
 }
 
-/** Pedidos que alteram estado têm de vir do próprio painel (proteção CSRF). */
+/**
+ * Pedidos que alteram estado têm de vir do próprio painel (proteção CSRF):
+ * o Origin enviado pelo navegador tem de corresponder ao host deste pedido.
+ * No Netlify, `request.url` não traz o domínio público, por isso usamos os
+ * cabeçalhos Host / X-Forwarded-Host (um site de terceiros não os controla).
+ */
 export function sameOrigin(request: Request) {
   const origin = request.headers.get("origin");
   if (!origin) return false;
-  const allowed = new Set([new URL(request.url).origin]);
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    allowed.add(new URL(process.env.NEXT_PUBLIC_SITE_URL).origin);
+  let originHost: string;
+  try {
+    const parsed = new URL(origin);
+    if (parsed.protocol !== "https:" && parsed.hostname !== "localhost") return false;
+    originHost = parsed.host;
+  } catch {
+    return false;
   }
-  return allowed.has(origin);
+
+  const hosts = new Set<string>();
+  for (const header of ["x-forwarded-host", "host"]) {
+    const value = request.headers.get(header)?.split(",")[0]?.trim();
+    if (value) hosts.add(value.toLowerCase());
+  }
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    hosts.add(new URL(process.env.NEXT_PUBLIC_SITE_URL).host.toLowerCase());
+  }
+  return hosts.has(originHost.toLowerCase());
 }
 
 export function errorResponse(error: unknown) {
