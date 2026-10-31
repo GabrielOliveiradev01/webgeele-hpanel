@@ -43,4 +43,17 @@ export const env = {
   stalwartApiPassword: () => process.env.STALWART_API_PASSWORD ?? "",
   webmailUrl: () =>
     process.env.NEXT_PUBLIC_WEBMAIL_URL ?? "https://webmail.webgeele.com.br",
+  // WebGeele Transfer Worker — só no servidor (nunca NEXT_PUBLIC_).
+  transferWorkerUrl: () => {
+    const url = (process.env.TRANSFER_WORKER_URL ?? "").trim().replace(/\/+$/, "");
+    if (!url) throw new Error("Missing environment variable: TRANSFER_WORKER_URL");
+    // As senhas seguem para o Worker: exige HTTPS (http só para testes locais).
+    const local = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(url);
+    if (!url.startsWith("https://") && !local) {
+      throw new Error("TRANSFER_WORKER_URL deve usar https://");
+    }
+    return url;
+  },
+  transferWorkerToken: () =>
+    required("TRANSFER_WORKER_TOKEN", process.env.TRANSFER_WORKER_TOKEN?.trim()),
 };
