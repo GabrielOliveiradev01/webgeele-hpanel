@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type { MigrationView } from "@/lib/transfer/service";
+import { StatusBadge } from "@/components/status-badge";
 
 type Provider = { id: string; label: string; hint: string };
 type Mailbox = { id: string; email: string };
@@ -14,13 +15,6 @@ const STATUS_LABEL: Record<MigrationView["status"], string> = {
   running: "Em andamento",
   completed: "Concluída",
   failed: "Falhou",
-};
-
-const STATUS_STYLE: Record<MigrationView["status"], string> = {
-  pending: "bg-amber-50 text-amber-700",
-  running: "bg-violet-50 text-violet-700",
-  completed: "bg-emerald-50 text-emerald-700",
-  failed: "bg-red-50 text-red-700",
 };
 
 const PHASE_LABEL: Record<string, string> = {
@@ -38,7 +32,7 @@ const formatDate = (value: string | null) =>
 const formatNumber = (value: number | null) => (value === null ? "—" : value.toLocaleString("pt-BR"));
 
 const inputClass =
-  "w-full rounded-xl border border-black/[0.08] bg-[#fafafa] px-3 py-2.5 text-sm disabled:opacity-50";
+  "wg-input disabled:opacity-50";
 
 export function MigrationPanel({
   providers,
@@ -160,10 +154,10 @@ export function MigrationPanel({
 
   if (mailboxes.length === 0) {
     return (
-      <div className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm">
+      <div className="wg-card p-6">
         <h2 className="font-display text-lg font-semibold text-wg-graphite">Nenhuma caixa ativa</h2>
         <p className="mt-2 text-sm text-wg-text-muted">
-          Crie primeiro a caixa de destino em <Link href="/caixas" className="font-medium text-wg-purple underline">Caixas de entrada</Link>.
+          Crie primeiro a caixa de destino em <Link href="/caixas" className="font-medium text-wg-brand underline">Caixas de entrada</Link>.
           Depois volte aqui para copiar as mensagens da conta antiga.
         </p>
       </div>
@@ -172,7 +166,7 @@ export function MigrationPanel({
 
   return (
     <div className="space-y-6">
-      <form onSubmit={onCheck} className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm" autoComplete="off">
+      <form onSubmit={onCheck} className="wg-card p-5" autoComplete="off">
         <div className="grid gap-6 md:grid-cols-2">
           <fieldset className="space-y-3">
             <legend className="font-display text-lg font-semibold text-wg-graphite">1. Conta de origem</legend>
@@ -246,11 +240,11 @@ export function MigrationPanel({
           </fieldset>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-black/[0.06] pt-5">
+        <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-wg-border/70 pt-5">
           <button
             type="submit"
             disabled={!formReady || !!busy}
-            className="rounded-xl border border-black/[0.08] px-4 py-2.5 text-sm font-medium text-wg-graphite disabled:opacity-50"
+            className="wg-btn-secondary"
           >
             {busy === "check" ? "Enviando…" : "Testar conexão"}
           </button>
@@ -258,7 +252,7 @@ export function MigrationPanel({
             type="button"
             onClick={() => submit("sync")}
             disabled={!verified || !formReady || !!busy || anyActiveSync}
-            className="rounded-xl bg-wg-graphite px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            className="wg-btn"
           >
             {busy === "sync" ? "Iniciando…" : "Iniciar migração"}
           </button>
@@ -272,52 +266,50 @@ export function MigrationPanel({
         </div>
       </form>
 
-      {error ? <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
-      {notice ? <p className="rounded-xl bg-violet-50 px-3 py-2 text-sm text-violet-800">{notice}</p> : null}
+      {error ? <p role="alert" className="wg-alert-error">{error}</p> : null}
+      {notice ? <p className="rounded-xl border border-wg-brand/15 bg-wg-brand/[0.06] px-3.5 py-2.5 text-sm text-wg-brand-dark">{notice}</p> : null}
 
       {current ? <MigrationDetails migration={current} /> : null}
 
-      <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm">
+      <div className="wg-card p-5">
         <h2 className="font-display text-lg font-semibold text-wg-graphite">Histórico</h2>
         {migrations.length === 0 ? (
           <p className="mt-2 text-sm text-wg-text-muted">Nenhuma migração ainda.</p>
         ) : (
-          <div className="mt-4 overflow-x-auto">
+          <div className="-mx-5 mt-4 overflow-x-auto border-t border-wg-border/70">
             <table className="w-full text-left text-sm">
-              <thead className="text-xs text-wg-text-muted uppercase">
+              <thead className="wg-table-head">
                 <tr>
-                  <th className="py-2 pr-4 font-medium">Data</th>
-                  <th className="py-2 pr-4 font-medium">Tipo</th>
-                  <th className="py-2 pr-4 font-medium">Origem → destino</th>
-                  <th className="py-2 pr-4 font-medium">Status</th>
-                  <th className="py-2 pr-4 font-medium">Copiadas</th>
-                  <th className="py-2 font-medium" />
+                  <th className="px-5 py-3">Data</th>
+                  <th className="px-5 py-3">Tipo</th>
+                  <th className="px-5 py-3">Origem → destino</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3">Copiadas</th>
+                  <th className="px-5 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black/[0.05]">
+              <tbody className="divide-y divide-wg-border/70">
                 {migrations.map((m) => (
-                  <tr key={m.id} className={m.id === currentId ? "bg-violet-50/40" : undefined}>
-                    <td className="py-2.5 pr-4 whitespace-nowrap text-wg-text-muted">{formatDate(m.createdAt)}</td>
-                    <td className="py-2.5 pr-4">{m.kind === "check" ? "Teste" : "Migração"}</td>
-                    <td className="py-2.5 pr-4">
+                  <tr key={m.id} className={m.id === currentId ? "bg-wg-brand/[0.04]" : undefined}>
+                    <td className="px-5 py-3 whitespace-nowrap text-wg-text-muted">{formatDate(m.createdAt)}</td>
+                    <td className="px-5 py-3">{m.kind === "check" ? "Teste" : "Migração"}</td>
+                    <td className="px-5 py-3">
                       <span className="block truncate">{m.sourceEmail}</span>
                       <span className="block truncate text-xs text-wg-text-muted">→ {m.destinationEmail}</span>
                     </td>
-                    <td className="py-2.5 pr-4">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[m.status]}`}>
-                        {STATUS_LABEL[m.status]}
-                      </span>
+                    <td className="px-5 py-3">
+                      <StatusBadge status={m.status} label={STATUS_LABEL[m.status]} />
                     </td>
-                    <td className="py-2.5 pr-4">{m.kind === "sync" ? formatNumber(m.progress.copied) : "—"}</td>
-                    <td className="py-2.5 text-right whitespace-nowrap">
-                      <button type="button" onClick={() => setCurrentId(m.id)} className="text-xs font-medium text-wg-purple">
+                    <td className="px-5 py-3">{m.kind === "sync" ? formatNumber(m.progress.copied) : "—"}</td>
+                    <td className="px-5 py-3 text-right whitespace-nowrap">
+                      <button type="button" onClick={() => setCurrentId(m.id)} className="text-xs font-medium text-wg-brand">
                         Detalhes
                       </button>
                       {m.kind === "sync" && !isActive(m) ? (
                         <button
                           type="button"
                           onClick={() => prepareResync(m)}
-                          className="ml-3 text-xs font-medium text-wg-graphite"
+                          className="ml-3 text-xs font-medium text-wg-graphite hover:text-wg-brand"
                         >
                           Sincronizar novamente
                         </button>
@@ -340,7 +332,7 @@ function MigrationDetails({ migration: m }: { migration: MigrationView }) {
   const phase = p.phase ? (PHASE_LABEL[p.phase] ?? p.phase) : null;
 
   return (
-    <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-sm" aria-live="polite">
+    <div className="wg-card p-5" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-display text-lg font-semibold text-wg-graphite">{title}</h2>
@@ -348,14 +340,14 @@ function MigrationDetails({ migration: m }: { migration: MigrationView }) {
             {m.sourceEmail} → {m.destinationEmail}
           </p>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLE[m.status]}`}>
-          {STATUS_LABEL[m.status]}
-          {isActive(m) && phase ? ` · ${phase}` : ""}
-        </span>
+        <StatusBadge
+          status={m.status}
+          label={`${STATUS_LABEL[m.status]}${isActive(m) && phase ? ` · ${phase}` : ""}`}
+        />
       </div>
 
       {m.kind === "check" && m.status === "completed" ? (
-        <p className="mt-4 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+        <p className="mt-4 wg-alert-success">
           Login confirmado nas duas contas. Você já pode iniciar a migração.
         </p>
       ) : null}
@@ -370,8 +362,8 @@ function MigrationDetails({ migration: m }: { migration: MigrationView }) {
                 </span>
                 <span>{p.percent.toLocaleString("pt-BR")}%</span>
               </div>
-              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-black/[0.06]">
-                <div className="h-full rounded-full bg-wg-purple transition-all" style={{ width: `${Math.min(100, p.percent)}%` }} />
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-wg-surface">
+                <div className="h-full rounded-full bg-wg-brand transition-all" style={{ width: `${Math.min(100, p.percent)}%` }} />
               </div>
             </div>
           ) : isActive(m) ? (
@@ -390,7 +382,7 @@ function MigrationDetails({ migration: m }: { migration: MigrationView }) {
         </>
       ) : null}
 
-      {m.error ? <p className="mt-4 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{m.error.message}</p> : null}
+      {m.error ? <p className="mt-4 wg-alert-error">{m.error.message}</p> : null}
 
       <p className="mt-4 text-xs text-wg-text-muted">
         Iniciada {formatDate(m.startedAt ?? m.createdAt)}
@@ -402,7 +394,7 @@ function MigrationDetails({ migration: m }: { migration: MigrationView }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-[#fafafa] px-3 py-2.5">
+    <div className="wg-stat">
       <dt className="text-xs text-wg-text-muted">{label}</dt>
       <dd className="mt-0.5 font-display text-lg font-semibold text-wg-graphite">{value}</dd>
     </div>

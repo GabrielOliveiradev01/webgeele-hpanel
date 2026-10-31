@@ -8,6 +8,8 @@ const statusMap: Record<string, { label: string; tone: keyof typeof tones }> = {
   resolved: { label: "Resolvido", tone: "success" },
   closed: { label: "Fechado", tone: "neutral" },
   pending: { label: "Pendente", tone: "warning" },
+  running: { label: "Em andamento", tone: "brand" },
+  completed: { label: "Concluído", tone: "success" },
   open: { label: "Aberto", tone: "brand" },
   answered: { label: "Respondido", tone: "brand" },
   overdue: { label: "Vencido", tone: "danger" },
