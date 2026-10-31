@@ -50,20 +50,33 @@ export class WorkerError extends Error {
 const TIMEOUT_MS = 15_000;
 
 async function workerFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  let baseUrl: string;
+  let token: string;
+  try {
+    baseUrl = env.transferWorkerUrl();
+    token = env.transferWorkerToken();
+  } catch (error) {
+    // Mensagem de configuração (nome da variável em falta), sem valores.
+    console.error(`[transfer] configuração inválida: ${(error as Error).message}`);
+    throw new WorkerError("Serviço de migração não configurado.", 503);
+  }
+
   let response: Response;
   try {
-    response = await fetch(`${env.transferWorkerUrl()}${path}`, {
+    response = await fetch(`${baseUrl}${path}`, {
       ...init,
       headers: {
-        Authorization: `Bearer ${env.transferWorkerToken()}`,
+        Authorization: `Bearer ${token}`,
         Accept: "application/json",
         "Content-Type": "application/json",
       },
       cache: "no-store",
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-  } catch {
-    // Não propaga a mensagem original: pode conter a URL ou detalhes internos.
+  } catch (error) {
+    // Ao cliente não vai a mensagem original; no log fica só o tipo do erro.
+    const cause = (error as Error & { cause?: { code?: string } })?.cause?.code ?? (error as Error)?.name;
+    console.error(`[transfer] Worker inacessível (${cause})`);
     throw new WorkerError("Serviço de migração indisponível. Tente novamente em instantes.", 503);
   }
 
@@ -73,6 +86,9 @@ async function workerFetch<T>(path: string, init?: RequestInit): Promise<T> {
   };
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 429 || response.status >= 500) {
+      console.error(`[transfer] Worker respondeu HTTP ${response.status} em ${init?.method ?? "GET"} ${path.split("/").slice(0, 2).join("/")}`);
+    }
     throw new WorkerError(
       typeof body.error === "string" ? body.error : `Worker respondeu ${response.status}`,
       response.status,
