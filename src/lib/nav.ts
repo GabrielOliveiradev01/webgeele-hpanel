@@ -7,6 +7,7 @@ export type NavItem = {
     | "domains"
     | "dns"
     | "mailboxes"
+    | "migration"
     | "account"
     | "plan"
     | "billing"
@@ -31,6 +32,7 @@ export const navGroups: NavGroup[] = [
     title: "Ferramentas",
     items: [
       { href: "/caixas", label: "Caixas de entrada", icon: "mailboxes" },
+      { href: "/migracao", label: "Migração de e-mails", icon: "migration" },
       { href: "/dominios", label: "Domínios", icon: "domains" },
       { href: "/dns", label: "DNS", icon: "dns" },
       { href: "/suporte", label: "Suporte", icon: "support" },
