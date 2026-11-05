@@ -13,15 +13,22 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { mainNav, navGroups } from "@/lib/nav";
+import { mainNav, navGroups, subPages } from "@/lib/nav";
 import { NavIcon } from "@/components/icons";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/logo";
 
-function isActive(pathname: string, href: string) {
+function matches(pathname: string, href: string) {
   if (!pathname) return false;
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function isActive(pathname: string, href: string) {
+  return (
+    matches(pathname, href) ||
+    subPages.some((page) => page.parent === href && matches(pathname, page.href))
+  );
 }
 
 function initialsOf(label: string) {
@@ -89,28 +96,52 @@ function SidebarNav({
           </div>
         ))}
       </nav>
+    </div>
+  );
+}
 
-      <div className="shrink-0 p-4">
-        <div className="relative overflow-hidden rounded-2xl bg-wg-brand p-4 text-white">
+function HelpBubble() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onClick(event: MouseEvent) {
+      if (!ref.current?.contains(event.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="fixed bottom-5 left-5 z-40">
+      {open ? (
+        <div className="absolute bottom-full left-0 mb-3 w-64 overflow-hidden rounded-2xl bg-wg-brand p-4 text-white shadow-[0_20px_50px_rgba(102,60,230,0.35)] animate-fade-up">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(230,106,175,0.55),transparent_55%)]" />
           <div className="relative">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
-              <Headphones className="h-4 w-4" />
-            </span>
-            <p className="mt-3 font-display text-sm font-semibold">Precisa de ajuda?</p>
+            <p className="font-display text-sm font-semibold">Precisa de ajuda?</p>
             <p className="mt-1 text-xs leading-relaxed text-white/75">
               Nossa equipe responde em horário comercial.
             </p>
             <Link
               href="/suporte"
-              onClick={onNavigate}
+              onClick={() => setOpen(false)}
               className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-white px-3 py-2 text-xs font-semibold text-wg-brand transition hover:bg-white/90"
             >
               Abrir chamado
             </Link>
           </div>
         </div>
-      </div>
+      ) : null}
+      <button
+        type="button"
+        aria-label={open ? "Fechar ajuda" : "Precisa de ajuda?"}
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-wg-brand text-white shadow-[0_10px_25px_rgba(102,60,230,0.4)] transition hover:scale-105 hover:bg-wg-brand-dark"
+      >
+        {open ? <X className="h-5 w-5" /> : <Headphones className="h-5 w-5" />}
+      </button>
     </div>
   );
 }
@@ -221,6 +252,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
   const currentGroup = navGroups.find((group) =>
     group.items.some((item) => item.href === current?.href),
   );
+  const currentSubPage = subPages.find((page) => matches(pathname, page.href));
 
   return (
     <div className="min-h-screen bg-wg-surface">
@@ -266,8 +298,19 @@ export function PanelShell({ children }: { children: ReactNode }) {
                 {currentGroup?.title ?? "Painel"}
               </span>
               <ChevronRight className="hidden h-4 w-4 text-wg-text-muted/60 sm:block" />
+              {currentSubPage && current ? (
+                <>
+                  <Link
+                    href={current.href}
+                    className="hidden truncate text-wg-text-muted transition hover:text-wg-graphite sm:inline"
+                  >
+                    {current.label}
+                  </Link>
+                  <ChevronRight className="hidden h-4 w-4 text-wg-text-muted/60 sm:block" />
+                </>
+              ) : null}
               <span className="truncate font-semibold text-wg-graphite">
-                {current?.label ?? "Painel"}
+                {currentSubPage?.label ?? current?.label ?? "Painel"}
               </span>
             </nav>
           </div>
@@ -294,6 +337,8 @@ export function PanelShell({ children }: { children: ReactNode }) {
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </div>
+
+      <HelpBubble />
     </div>
   );
 }

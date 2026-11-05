@@ -53,7 +53,7 @@ export function LoginForm() {
     <AuthShell
       panel={
         <BrandPanel
-          title="Seu e-mail profissional, domínios e DNS em um só lugar."
+          title="Seu e-mail profissional, domínios e faturas em um só lugar."
           description="Gerencie caixas de e-mail, acompanhe seu plano e fale com o suporte sem sair do painel WebGeele."
         >
           <MailboxPreview />

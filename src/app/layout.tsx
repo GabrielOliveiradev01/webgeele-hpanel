@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import "./globals.css";
+import { seoDescription, seoKeywords, siteName, siteUrl } from "@/lib/site";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -15,12 +16,28 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  applicationName: siteName,
   title: {
-    default: "Painel do cliente | WebGeele",
+    default: "E-mail profissional com domínio próprio | WebGeele",
     template: "%s | WebGeele",
   },
-  description:
-    "Área do cliente WebGeele para gerenciar conta, serviços, domínios, DNS, plano, financeiro e suporte.",
+  description: seoDescription,
+  keywords: seoKeywords,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName,
+    title: "Caixa de e-mail profissional com domínio próprio | WebGeele",
+    description: seoDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Caixa de e-mail profissional com domínio próprio | WebGeele",
+    description: seoDescription,
+  },
+  // Áreas logadas não devem ir para o Google; páginas públicas liberam no próprio metadata.
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -47,7 +47,7 @@ export default async function CaixasPage() {
     <div>
       <PageHeader
         title="Caixas de entrada"
-        description="Assine caixas no Assas e crie e-mails na cota contratada. Domínios sem limite."
+        description="Assine caixas e crie e-mails na cota contratada. Domínios sem limite."
       />
       <MailboxesPanel
         mailboxes={mailboxes}

@@ -1,5 +1,6 @@
 "use client";
 
+import { startingPriceLabel } from "@/lib/site";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Globe, Mail, MailCheck, User } from "lucide-react";
@@ -74,8 +75,8 @@ export function SignupForm() {
     <AuthShell
       panel={
         <BrandPanel
-          title="Crie sua conta e tenha seu e-mail profissional em minutos."
-          description="Cadastre-se, conecte seu domínio e comece a usar caixas de e-mail com a sua marca."
+          title="Compre sua caixa de e-mail profissional com domínio próprio."
+          description={`A partir de ${startingPriceLabel}/mês no plano anual. Cadastre-se, conecte seu domínio e use e-mails com a sua marca em minutos.`}
         >
           <OnboardingSteps />
         </BrandPanel>

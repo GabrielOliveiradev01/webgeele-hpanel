@@ -9,7 +9,6 @@ import {
   Headphones,
   Inbox,
   LifeBuoy,
-  Network,
   Plus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -92,19 +91,19 @@ export default async function Home() {
   const steps = [
     {
       title: "Cadastre seu domínio",
-      description: "Traga um domínio que você já tem ou registre um novo.",
+      description: "Adicione o domínio que você já tem.",
       href: "/dominios",
       done: domains.length > 0,
     },
     {
       title: "Configure o DNS",
-      description: "Aponte MX, SPF e DKIM para ativar o correio.",
-      href: "/dns",
+      description: "Cadastre MX, SPF e DKIM no provedor do domínio.",
+      href: "/dominios",
       done: domains.some((domain) => domain.status === "active"),
     },
     {
       title: "Assine suas caixas",
-      description: "Planos mensais ou anuais no cartão via Assas.",
+      description: "Planos mensais ou anuais no cartão de crédito.",
       href: "/caixas",
       done: maxMailboxes > 0,
     },
@@ -120,7 +119,6 @@ export default async function Home() {
   const shortcuts: Array<{ href: string; label: string; icon: LucideIcon }> = [
     { href: "/caixas", label: "Caixas", icon: Inbox },
     { href: "/dominios", label: "Domínios", icon: Globe2 },
-    { href: "/dns", label: "DNS", icon: Network },
     { href: "/plano", label: "Plano", icon: Gauge },
     { href: "/financeiro", label: "Financeiro", icon: CreditCard },
     { href: "/suporte", label: "Suporte", icon: LifeBuoy },
@@ -144,7 +142,7 @@ export default async function Home() {
             Olá, {name}
           </h1>
           <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-white/75">
-            Caixas por assinatura, domínios ilimitados e DNS do correio. Tudo o que sua
+            Caixas por assinatura, domínios ilimitados e migração do seu e-mail antigo. Tudo o que sua
             empresa precisa para ter e-mail profissional.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">

@@ -78,7 +78,7 @@ export default async function FinanceiroPage() {
     <div className="space-y-6">
       <PageHeader
         title="Financeiro"
-        description="Assinatura, pedidos de caixas/domínios e cobranças Assas."
+        description="Assinatura, pedidos de caixas/domínios e cobranças."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">

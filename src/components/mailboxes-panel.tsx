@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowRightLeft } from "lucide-react";
 import { BuyMailboxModal } from "@/components/buy-mailbox-modal";
 type Mailbox = {
   id: string;
@@ -98,7 +100,7 @@ export function MailboxesPanel({
           <p className="mt-2 font-display text-2xl font-semibold text-wg-graphite">
             {entitlement?.extraMailboxes ?? 0}
           </p>
-          <p className="mt-1 text-xs text-wg-text-muted">Caixas contratadas no Assas</p>
+          <p className="mt-1 text-xs text-wg-text-muted">Caixas contratadas</p>
         </div>
         <div className="wg-card p-5 shadow-sm">
           <p className="text-xs font-medium tracking-wide text-wg-text-muted uppercase">
@@ -108,7 +110,7 @@ export function MailboxesPanel({
             {storageUsed} / {storageMax} MB
           </p>
           <p className="mt-1 text-xs text-wg-text-muted">
-            Start 2GB · Business 5GB · Pro 15GB
+            Start 2 GB · Business 5 GB · Business Plus 10 GB
           </p>
         </div>
         <div className="wg-card p-5 shadow-sm">
@@ -127,7 +129,7 @@ export function MailboxesPanel({
             Assinar caixas de entrada
           </h2>
           <p className="mt-1 text-sm text-wg-text-muted">
-            Sem caixas grátis. Contrate no Assas (mensal ou anual) e depois crie os e-mails.
+            Sem caixas grátis. Contrate um plano (mensal ou anual) e depois crie os e-mails.
           </p>
         </div>
         <button
@@ -139,6 +141,28 @@ export function MailboxesPanel({
         </button>
       </div>
 
+      <Link
+        href="/migracao"
+        className="group flex flex-wrap items-center justify-between gap-3 wg-card p-5 transition hover:border-wg-brand/30"
+      >
+        <div className="flex items-center gap-4">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-wg-brand/[0.08] text-wg-brand">
+            <ArrowRightLeft className="h-5 w-5" />
+          </span>
+          <div>
+            <h2 className="font-display text-base font-semibold text-wg-graphite">
+              Trazer e-mails de outro provedor
+            </h2>
+            <p className="mt-0.5 text-sm text-wg-text-muted">
+              Copie mensagens e pastas da conta antiga para uma caixa WebGeele, sem apagar nada na origem.
+            </p>
+          </div>
+        </div>
+        <span className="text-sm font-semibold text-wg-brand transition group-hover:translate-x-0.5">
+          Iniciar migração →
+        </span>
+      </Link>
+
       <div className="wg-card p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -146,7 +170,7 @@ export function MailboxesPanel({
               Criar caixa de e-mail
             </h2>
             <p className="mt-1 text-sm text-wg-text-muted">
-              Usa somente a cota das assinaturas Assas.
+              Usa somente a cota das suas assinaturas.
             </p>
           </div>
           <a

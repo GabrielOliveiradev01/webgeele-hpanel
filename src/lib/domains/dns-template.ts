@@ -41,7 +41,7 @@ function purposeFor(type: string, name: string, value: string): string {
   const host = name.toLowerCase();
   const content = value.toLowerCase();
 
-  if (type === "MX") return "Recebimento de e-mail (Stalwart)";
+  if (type === "MX") return "Recebimento de e-mail";
   if (type === "TXT" && host.includes("_domainkey")) return "DKIM — assinatura de envio";
   if (type === "TXT" && (host === "_dmarc" || host.startsWith("_dmarc."))) {
     return "DMARC — política de autenticação";
@@ -135,7 +135,7 @@ export function buildMailDnsSuggestions(domain: string): SuggestedDnsRecord[] {
       value: host,
       ttl: 3600,
       priority: 10,
-      purpose: "Recebimento de e-mail (Stalwart)",
+      purpose: "Recebimento de e-mail",
     },
     {
       type: "TXT",

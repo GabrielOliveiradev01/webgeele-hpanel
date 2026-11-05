@@ -16,7 +16,7 @@ export const MAILBOX_PLANS: MailboxPlan[] = [
     code: "start",
     name: "Start",
     monthlyCents: 990,
-    annualCents: 9900,
+    annualCents: 5880, // R$ 4,90/mês no anual
     storageMb: 2 * 1024,
     storageLabel: "2 GB",
   },
@@ -24,17 +24,18 @@ export const MAILBOX_PLANS: MailboxPlan[] = [
     code: "business",
     name: "Business",
     monthlyCents: 1490,
-    annualCents: 14990,
+    annualCents: 9480, // R$ 7,90/mês no anual
     storageMb: 5 * 1024,
     storageLabel: "5 GB",
   },
   {
+    // O código interno continua "professional"; o nome segue o site (Business Plus).
     code: "professional",
-    name: "Profissional",
+    name: "Business Plus",
     monthlyCents: 2490,
-    annualCents: 24990,
-    storageMb: 15 * 1024,
-    storageLabel: "15 GB",
+    annualCents: 14280, // R$ 11,90/mês no anual
+    storageMb: 10 * 1024,
+    storageLabel: "10 GB",
   },
 ];
 

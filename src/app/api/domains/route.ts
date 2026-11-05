@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
+import { publicErrorMessage } from "@/lib/errors";
 import { requireAccount } from "@/lib/auth/account";
-import {
-  addExternalDomain,
-  createDomainOrder,
-  listDomains,
-  updateDomainNameservers,
-} from "@/lib/domains/service";
-import { markOrderPaidLocally } from "@/lib/billing/orders";
+import { addExternalDomain, listDomains } from "@/lib/domains/service";
 
 export async function GET() {
   const { account, error } = await requireAccount();
@@ -34,36 +29,10 @@ export async function POST(request: Request) {
       return NextResponse.json(result);
     }
 
-    if (action === "register" || action === "transfer") {
-      const order = await createDomainOrder({
-        accountId: account.id,
-        domain: body.name,
-        type: action === "transfer" ? "domain_transfer" : "domain_register",
-        authCode: body.authCode,
-        billingType: body.billingType || "PIX",
-      });
-
-      // Sandbox: libera imediatamente para o painel funcionar sem webhook externo
-      if (process.env.ASAAS_API_URL?.includes("sandbox")) {
-        await markOrderPaidLocally(order.id, account.id);
-      }
-
-      return NextResponse.json({ order });
-    }
-
-    if (action === "nameservers") {
-      const domain = await updateDomainNameservers(
-        account.id,
-        body.domainId,
-        body.nameservers || [],
-      );
-      return NextResponse.json({ domain });
-    }
-
     return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Falha" },
+      { error: publicErrorMessage(err, "Falha") },
       { status: 400 },
     );
   }

@@ -26,13 +26,13 @@ export default async function ServicosPage() {
       : null,
     mailboxes.length
       ? {
-          name: "Caixas Stalwart",
+          name: "Caixas de e-mail",
           detail: `${mailboxes.length} / ${entitlement?.maxMailboxes ?? 0} caixas`,
           status: "Ativo",
           href: "/caixas",
         }
       : {
-          name: "Caixas Stalwart",
+          name: "Caixas de e-mail",
           detail: "Nenhuma caixa criada",
           status: "—",
           href: "/caixas",
@@ -50,14 +50,6 @@ export default async function ServicosPage() {
           status: "—",
           href: "/dominios",
         },
-    {
-      name: "DNS",
-      detail: domains.length
-        ? "Gerenciamento de registros"
-        : "Adicione um domínio para configurar DNS",
-      status: domains.length ? "Ativo" : "—",
-      href: "/dns",
-    },
   ].filter(Boolean) as Array<{
     name: string;
     detail: string;

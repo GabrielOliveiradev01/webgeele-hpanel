@@ -63,7 +63,7 @@ export async function createMailboxForAccount(input: {
   const existing = await listAccountMailboxes(input.accountId);
   const maxMailboxes = entitlement?.maxMailboxes ?? 0;
   if (maxMailboxes <= 0) {
-    throw new Error("Nenhuma cota de caixa disponível. Compre uma assinatura Assas para continuar.");
+    throw new Error("Nenhuma cota de caixa disponível. Contrate um plano de caixas para continuar.");
   }
   if (existing.length >= maxMailboxes) {
     throw new Error(
@@ -77,7 +77,7 @@ export async function createMailboxForAccount(input: {
     input.planCode,
   );
   if (!plan) {
-    throw new Error("Não há slot de plano disponível. Compre caixas no Assas.");
+    throw new Error("Não há slot de plano disponível. Contrate mais caixas para continuar.");
   }
 
   const email = input.email.trim().toLowerCase();
@@ -105,7 +105,7 @@ export async function createMailboxForAccount(input: {
   const domains = await stalwart.listDomains();
   const allowed = (domains.data?.items ?? []).some((item) => item.name === domain);
   if (!allowed) {
-    throw new Error(`Domínio ${domain} não está configurado no Stalwart.`);
+    throw new Error(`Domínio ${domain} ainda não está ativo no servidor de e-mail.`);
   }
 
   const password = input.password || randomPassword();

@@ -1,24 +1,7 @@
-import type { Metadata } from "next";
-import { requireAccount } from "@/lib/auth/account";
-import { listDomains } from "@/lib/domains/service";
-import { listDnsRecords } from "@/lib/dns/service";
-import { PageHeader } from "@/components/page-header";
-import { DnsPanel } from "@/components/dns-panel";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "DNS" };
-
-export default async function DnsPage() {
-  const { account } = await requireAccount();
-  const domains = account ? await listDomains(account.id) : [];
-  const records = account ? await listDnsRecords(account.id) : [];
-
-  return (
-    <div>
-      <PageHeader
-        title="DNS"
-        description="Gerencie registros A, AAAA, CNAME, MX, TXT e outros por domínio."
-      />
-      <DnsPanel domains={domains} records={records as never} />
-    </div>
-  );
+// O gerenciador de DNS está fora do ar até termos um servidor de DNS próprio.
+// Os registros de e-mail de cada domínio ficam em Domínios → Ver DNS.
+export default function DnsPage() {
+  redirect("/dominios");
 }

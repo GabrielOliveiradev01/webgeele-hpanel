@@ -15,7 +15,7 @@ export default async function PlanoPage() {
     <div>
       <PageHeader
         title="Plano e consumo"
-        description="Caixas por assinatura Assas, armazenamento por quantidade de caixas e domínios ilimitados."
+        description="Caixas por assinatura, armazenamento por quantidade de caixas e domínios ilimitados."
       />
       <div className="grid gap-4 md:grid-cols-2">
         <div className="wg-card p-6 shadow-sm">
@@ -24,7 +24,7 @@ export default async function PlanoPage() {
             {entitlement?.usedMailboxes ?? 0} / {entitlement?.maxMailboxes ?? 0}
           </p>
           <p className="mt-2 text-sm text-wg-text-muted">
-            Assinaturas Assas: {entitlement?.extraMailboxes ?? 0} · sem cota grátis
+            Caixas contratadas: {entitlement?.extraMailboxes ?? 0} · sem cota grátis
           </p>
           <Link href="/caixas" className="mt-4 inline-flex text-sm font-medium text-wg-graphite underline">
             Comprar caixas
@@ -50,7 +50,7 @@ export default async function PlanoPage() {
           </Link>
         </div>
         <div className="wg-card p-6 shadow-sm md:col-span-2">
-          <p className="text-sm text-wg-text-muted">Planos de caixa (Assas)</p>
+          <p className="text-sm text-wg-text-muted">Planos de caixa</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {MAILBOX_PLANS.map((plan) => (
               <div key={plan.code} className="wg-stat">
@@ -61,11 +61,11 @@ export default async function PlanoPage() {
                     currency: "BRL",
                   })}
                   /mês ·{" "}
-                  {(plan.annualCents / 100).toLocaleString("pt-BR", {
+                  {(Math.round(plan.annualCents / 12) / 100).toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
-                  /ano
+                  /mês no anual
                 </p>
                 <p className="mt-1 text-xs text-wg-text-muted">{plan.storageLabel} por caixa</p>
                 <p className="mt-2 text-sm font-medium text-wg-graphite">

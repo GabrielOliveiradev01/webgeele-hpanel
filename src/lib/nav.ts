@@ -32,9 +32,7 @@ export const navGroups: NavGroup[] = [
     title: "Ferramentas",
     items: [
       { href: "/caixas", label: "Caixas de entrada", icon: "mailboxes" },
-      { href: "/migracao", label: "Migração de e-mails", icon: "migration" },
       { href: "/dominios", label: "Domínios", icon: "domains" },
-      { href: "/dns", label: "DNS", icon: "dns" },
       { href: "/suporte", label: "Suporte", icon: "support" },
     ],
   },
@@ -48,3 +46,8 @@ export const navGroups: NavGroup[] = [
 ];
 
 export const mainNav: NavItem[] = navGroups.flatMap((group) => group.items);
+
+// Páginas fora do menu: acessadas a partir de outra tela, que fica destacada no menu.
+export const subPages: Array<{ href: string; label: string; parent: string }> = [
+  { href: "/migracao", label: "Migração de e-mails", parent: "/caixas" },
+];

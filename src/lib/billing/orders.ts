@@ -23,9 +23,19 @@ export async function ensureAsaasCustomer(accountId: string) {
     .single();
   if (error || !account) throw error || new Error("Conta não encontrada");
 
-  if (account.asaas_customer_id) return account.asaas_customer_id as string;
-
   const asaas = createAsaasClient();
+
+  // IDs criados no sandbox não existem em produção (e vice-versa): só reaproveita
+  // o cliente salvo se ele existir no ambiente atual do Assas.
+  if (account.asaas_customer_id) {
+    const stored = account.asaas_customer_id as string;
+    try {
+      await asaas.getCustomer(stored);
+      return stored;
+    } catch (err) {
+      if (!(err instanceof Error) || !err.message.startsWith("Asaas 404")) throw err;
+    }
+  }
   const existing = await asaas.findCustomersByEmail(account.email);
   const found = existing.data?.[0];
   if (found?.id) {
@@ -42,7 +52,7 @@ export async function ensureAsaasCustomer(accountId: string) {
 
   if (!document) {
     throw new Error(
-      "Informe o CPF/CNPJ em Minha conta antes de gerar cobrança no Assas.",
+      "Informe o CPF/CNPJ em Minha conta antes de gerar a cobrança.",
     );
   }
 

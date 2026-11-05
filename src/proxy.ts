@@ -7,6 +7,11 @@ const PUBLIC_PATHS = [
   "/auth/callback",
   "/auth/confirm",
   "/api/webhooks/asaas",
+  // Arquivos de SEO: o Google precisa lê-los sem login.
+  "/robots.txt",
+  "/sitemap.xml",
+  "/opengraph-image",
+  "/llms.txt",
 ];
 
 export async function proxy(request: NextRequest) {

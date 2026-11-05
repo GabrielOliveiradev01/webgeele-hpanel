@@ -115,7 +115,7 @@ export function MailboxCheckout({
 
     if (!payload.paid) {
       setError(
-        `Pagamento em análise (${payload.payment?.status || "pendente"}). A cota libera quando o Assas confirmar.`,
+        `Pagamento em análise (${payload.payment?.status || "pendente"}). A cota é liberada assim que o pagamento for confirmado.`,
       );
       return;
     }
@@ -135,7 +135,7 @@ export function MailboxCheckout({
         </h1>
         <p className="mt-2 text-sm text-wg-text-muted">
           +{quantity}× {plan.name} · {cycle === "annual" ? "anual" : "mensal"} ·{" "}
-          {totals.totalLabel}. Assinatura Assas ativa.
+          {totals.totalLabel}. Assinatura ativa.
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Link
@@ -182,7 +182,7 @@ export function MailboxCheckout({
       <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
         <form onSubmit={onSubmit} className="space-y-6 border-b border-wg-border p-5 sm:p-8 lg:border-r lg:border-b-0">
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            Assinatura Assas · plano {plan.name} ·{" "}
+            Assinatura · plano {plan.name} ·{" "}
             {cycle === "monthly" ? "mensal recorrente" : "cobrança única anual"} · só
             cartão.
           </div>
@@ -316,7 +316,7 @@ export function MailboxCheckout({
               className="mt-1"
             />
             <span>
-              Concordo com a assinatura Assas e a cobrança no cartão informada.
+              Concordo com a assinatura e a cobrança no cartão informada.
             </span>
           </label>
         </form>
@@ -370,7 +370,7 @@ export function MailboxCheckout({
             {loading ? "Processando cartão..." : `Pagar ${totals.totalLabel}`}
           </button>
           <p className="mt-3 text-center text-xs text-wg-text-muted">
-            Processamento seguro via Assas
+            Pagamento processado com segurança
           </p>
         </aside>
       </div>

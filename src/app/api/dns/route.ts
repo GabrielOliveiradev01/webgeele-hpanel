@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { publicErrorMessage } from "@/lib/errors";
 import { requireAccount } from "@/lib/auth/account";
 import {
   createDnsRecord,
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ record });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Falha" },
+      { error: publicErrorMessage(err, "Falha") },
       { status: 400 },
     );
   }

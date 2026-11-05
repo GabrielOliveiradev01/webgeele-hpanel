@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAccount } from "@/lib/auth/account";
 import { createExtraMailboxOrder } from "@/lib/billing/orders";
+import { publicErrorMessage } from "@/lib/errors";
 
 function clientIp(request: Request) {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Falha na compra" },
+      { error: publicErrorMessage(err, "Falha na compra") },
       { status: 400 },
     );
   }

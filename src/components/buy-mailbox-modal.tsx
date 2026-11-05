@@ -10,6 +10,10 @@ import {
   type MailboxPlanCode,
 } from "@/lib/billing/mailbox-pricing";
 
+function perMonth(plan: { monthlyCents: number; annualCents: number }, cycle: MailboxBillingCycle) {
+  return cycle === "annual" ? Math.round(plan.annualCents / 12) : plan.monthlyCents;
+}
+
 function money(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", {
     style: "currency",
@@ -26,7 +30,7 @@ export function BuyMailboxModal({
 }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
-  const [cycle, setCycle] = useState<MailboxBillingCycle>("monthly");
+  const [cycle, setCycle] = useState<MailboxBillingCycle>("annual");
   const [planCode, setPlanCode] = useState<MailboxPlanCode>("start");
 
   const totals = useMemo(
@@ -61,7 +65,7 @@ export function BuyMailboxModal({
               Escolher plano de e-mail
             </h2>
             <p className="mt-1 text-sm text-wg-text-muted">
-              Assinatura Assas no cartão. Depois você finaliza no checkout.
+              Assinatura no cartão de crédito. Depois você finaliza no checkout.
             </p>
           </div>
           <button
@@ -74,6 +78,28 @@ export function BuyMailboxModal({
         </div>
 
         <div className="space-y-4 px-5 py-5">
+          <div className="grid grid-cols-2 gap-1 rounded-xl bg-wg-surface p-1">
+            {(["annual", "monthly"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setCycle(value)}
+                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                  cycle === value
+                    ? "bg-white text-wg-graphite shadow-sm"
+                    : "text-wg-text-muted hover:text-wg-graphite"
+                }`}
+              >
+                {value === "annual" ? "Anual" : "Mensal"}
+                {value === "annual" ? (
+                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                    Mais barato
+                  </span>
+                ) : null}
+              </button>
+            ))}
+          </div>
+
           <div className="grid gap-2">
             {MAILBOX_PLANS.map((plan) => {
               const selected = planCode === plan.code;
@@ -84,7 +110,7 @@ export function BuyMailboxModal({
                   onClick={() => setPlanCode(plan.code)}
                   className={`rounded-xl border px-4 py-3 text-left ${
                     selected
-                      ? "border-wg-graphite bg-wg-brand text-white"
+                      ? "border-wg-brand bg-wg-brand text-white"
                       : "border-wg-border bg-white text-wg-graphite"
                   }`}
                 >
@@ -96,40 +122,17 @@ export function BuyMailboxModal({
                       </p>
                     </div>
                     <div className="text-right text-sm">
-                      <p className="font-semibold">{money(plan.monthlyCents)}/mês</p>
+                      <p className="font-semibold">{money(perMonth(plan, cycle))}/mês</p>
                       <p className={`text-xs ${selected ? "text-white/70" : "text-wg-text-muted"}`}>
-                        ou {money(plan.annualCents)}/ano
+                        {cycle === "annual"
+                          ? `${money(plan.annualCents)} por ano`
+                          : `${money(perMonth(plan, "annual"))}/mês no anual`}
                       </p>
                     </div>
                   </div>
                 </button>
               );
             })}
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setCycle("monthly")}
-              className={`rounded-xl border px-3 py-2.5 text-sm font-medium ${
-                cycle === "monthly"
-                  ? "border-wg-graphite bg-[#f3f3f4] text-wg-graphite"
-                  : "border-wg-border text-wg-text-muted"
-              }`}
-            >
-              Mensal
-            </button>
-            <button
-              type="button"
-              onClick={() => setCycle("annual")}
-              className={`rounded-xl border px-3 py-2.5 text-sm font-medium ${
-                cycle === "annual"
-                  ? "border-wg-graphite bg-[#f3f3f4] text-wg-graphite"
-                  : "border-wg-border text-wg-text-muted"
-              }`}
-            >
-              Anual
-            </button>
           </div>
 
           <label className="block text-sm">
