@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
+import { DnsGuide } from "@/components/dns-guide";
 
 type Domain = {
   id: string;
@@ -16,54 +17,9 @@ type DnsRow = {
   value: string;
   ttl: number;
   priority: number | null;
-  purpose?: string;
 };
 
 type StoredDnsRow = DnsRow & { domain_id?: string };
-
-function copyRows(rows: DnsRow[]) {
-  const text = rows
-    .map((row) => [row.type, row.name, row.value, row.ttl, row.priority ?? ""].join("\t"))
-    .join("\n");
-  return navigator.clipboard.writeText(`Tipo\tHost\tValor\tTTL\tPrioridade\n${text}`);
-}
-
-function DnsTable({ rows }: { rows: DnsRow[] }) {
-  const showPurpose = rows.some((row) => row.purpose);
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px] text-left text-sm">
-        <thead className="border-b border-wg-border text-wg-text-muted">
-          <tr>
-            <th className="px-2 py-2">Tipo</th>
-            <th className="px-2 py-2">Host</th>
-            <th className="px-2 py-2">Valor</th>
-            <th className="px-2 py-2">TTL</th>
-            <th className="px-2 py-2">Prioridade</th>
-            {showPurpose ? <th className="px-2 py-2">Para que serve</th> : null}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr
-              key={`${row.type}-${row.name}-${row.value}`}
-              className="border-b border-wg-border last:border-0"
-            >
-              <td className="px-2 py-2 font-medium text-wg-graphite">{row.type}</td>
-              <td className="px-2 py-2">{row.name}</td>
-              <td className="px-2 py-2 break-all font-mono text-xs">{row.value}</td>
-              <td className="px-2 py-2">{row.ttl}</td>
-              <td className="px-2 py-2">{row.priority ?? "—"}</td>
-              {showPurpose ? (
-                <td className="px-2 py-2 text-wg-text-muted">{row.purpose ?? ""}</td>
-              ) : null}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 export function DomainsPanel({
   domains,
@@ -78,7 +34,8 @@ export function DomainsPanel({
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [suggestedDns, setSuggestedDns] = useState<DnsRow[]>([]);
-  const [suggestedDomain, setSuggestedDomain] = useState("");
+  const [suggestedDomain, setSuggestedDomain] = useState<{ id?: string; name: string } | null>(null);
+  const [statuses, setStatuses] = useState<Record<string, string>>({});
   const [openId, setOpenId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -99,8 +56,8 @@ export function DomainsPanel({
         return;
       }
       setSuggestedDns(payload.suggestedDns ?? []);
-      setSuggestedDomain(payload.domain?.name || name);
-      setInfo("Domínio adicionado. Cadastre os registros abaixo onde o domínio está hospedado.");
+      setSuggestedDomain({ id: payload.domain?.id, name: payload.domain?.name || name });
+      setInfo("Domínio adicionado. Cadastre os registros obrigatórios abaixo e depois clique em Verificar DNS.");
       setName("");
       setTab("list");
       router.refresh();
@@ -109,11 +66,6 @@ export function DomainsPanel({
     } finally {
       setLoading(false);
     }
-  }
-
-  async function onCopy(rows: DnsRow[]) {
-    await copyRows(rows);
-    setInfo("Registros copiados. Cole no painel do seu provedor de DNS.");
   }
 
   return (
@@ -141,25 +93,12 @@ export function DomainsPanel({
       {error ? <p role="alert" className="wg-alert-error">{error}</p> : null}
       {info ? <p className="wg-alert-success">{info}</p> : null}
 
-      {suggestedDns.length > 0 ? (
+      {suggestedDns.length > 0 && suggestedDomain ? (
         <div className="rounded-2xl border border-wg-brand/30 bg-white p-6 shadow-[0_10px_30px_rgba(102,60,230,0.10)]">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="font-display text-lg font-semibold text-wg-graphite">
-                DNS para {suggestedDomain}
-              </h2>
-              <p className="mt-1 text-sm text-wg-text-muted">
-                Cadastre estes registros no DNS do domínio (Registro.br, Cloudflare, Hostinger,
-                etc.), incluindo MX, SPF, DKIM e DMARC. Depois disso o e-mail passa a funcionar.
-              </p>
-            </div>
-            <button type="button" onClick={() => onCopy(suggestedDns)} className="wg-btn-secondary px-3.5 py-2">
-              Copiar DNS
-            </button>
-          </div>
-          <div className="mt-4">
-            <DnsTable rows={suggestedDns} />
-          </div>
+          <h2 className="mb-4 font-display text-lg font-semibold text-wg-graphite">
+            DNS para {suggestedDomain.name}
+          </h2>
+          <DnsGuide domain={suggestedDomain.name} domainId={suggestedDomain.id} records={suggestedDns} />
         </div>
       ) : null}
 
@@ -189,8 +128,8 @@ export function DomainsPanel({
                       <td className="px-4 py-3 font-medium text-wg-graphite">{domain.name}</td>
                       <td className="px-4 py-3">
                         <StatusBadge
-                          status={domain.status}
-                          label={domain.status === "pending" ? "Aguardando DNS" : undefined}
+                          status={statuses[domain.id] ?? domain.status}
+                          label={(statuses[domain.id] ?? domain.status) === "pending" ? "Aguardando DNS" : undefined}
                         />
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -200,27 +139,22 @@ export function DomainsPanel({
                             onClick={() => setOpenId(open ? null : domain.id)}
                             className="text-sm font-semibold text-wg-brand hover:underline"
                           >
-                            {open ? "Ocultar DNS" : "Ver DNS"}
+                            {open ? "Ocultar DNS" : "Configurar DNS"}
                           </button>
                         ) : null}
                       </td>
                     </tr>,
                     open ? (
                       <tr key={`${domain.id}-dns`} className="border-b border-wg-border bg-wg-surface/60">
-                        <td colSpan={3} className="px-4 py-4">
-                          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                            <p className="text-sm text-wg-text-muted">
-                              Cadastre estes registros onde o domínio está hospedado.
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => onCopy(rows)}
-                              className="wg-btn-secondary px-3 py-1.5 text-xs"
-                            >
-                              Copiar DNS
-                            </button>
-                          </div>
-                          <DnsTable rows={rows} />
+                        <td colSpan={3} className="px-4 py-5">
+                          <DnsGuide
+                            domain={domain.name}
+                            domainId={domain.id}
+                            records={rows}
+                            onStatusChange={(status) =>
+                              setStatuses((current) => ({ ...current, [domain.id]: status }))
+                            }
+                          />
                         </td>
                       </tr>
                     ) : null,

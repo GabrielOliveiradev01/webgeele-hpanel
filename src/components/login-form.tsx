@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle2, Globe, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { authErrorMessage } from "@/lib/auth/messages";
 import {
   AuthError,
   AuthField,
@@ -24,7 +25,7 @@ export function LoginForm() {
 
   useEffect(() => {
     const paramError = searchParams.get("error");
-    if (paramError) setError(paramError);
+    if (paramError) setError(authErrorMessage(paramError));
   }, [searchParams]);
 
   async function onSubmit(event: FormEvent) {
@@ -41,7 +42,7 @@ export function LoginForm() {
     setLoading(false);
 
     if (signInError) {
-      setError(signInError.message);
+      setError(authErrorMessage(signInError.message));
       return;
     }
 
@@ -86,6 +87,12 @@ export function LoginForm() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
+
+        <div className="-mt-2 text-right">
+          <Link href="/recuperar-senha" className="text-sm font-medium text-wg-brand hover:underline">
+            Esqueci minha senha
+          </Link>
+        </div>
 
         <AuthError message={error} />
 

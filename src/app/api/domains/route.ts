@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { publicErrorMessage } from "@/lib/errors";
 import { requireAccount } from "@/lib/auth/account";
 import { addExternalDomain, listDomains } from "@/lib/domains/service";
+import { checkDomainDns } from "@/lib/domains/dns-check";
 
 export async function GET() {
   const { account, error } = await requireAccount();
@@ -26,6 +27,11 @@ export async function POST(request: Request) {
 
     if (action === "add_external") {
       const result = await addExternalDomain(account.id, body.name);
+      return NextResponse.json(result);
+    }
+
+    if (action === "check_dns") {
+      const result = await checkDomainDns(account.id, body.domainId);
       return NextResponse.json(result);
     }
 

@@ -1,0 +1,5 @@
+- confirmacao.html: Confirme seu cadastro na WebGeele
+- redefinir-senha.html: Redefina sua senha da WebGeele
+- link-magico.html: Seu link de acesso à WebGeele
+- troca-email.html: Confirme seu novo e-mail na WebGeele
+- convite.html: Você foi convidado para a WebGeele

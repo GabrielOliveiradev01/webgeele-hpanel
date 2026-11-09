@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Globe, Mail, MailCheck, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { authErrorMessage } from "@/lib/auth/messages";
 import {
   AuthError,
   AuthField,
@@ -56,7 +57,7 @@ export function SignupForm() {
     setLoading(false);
 
     if (signUpError) {
-      setError(signUpError.message);
+      setError(authErrorMessage(signUpError.message));
       return;
     }
 

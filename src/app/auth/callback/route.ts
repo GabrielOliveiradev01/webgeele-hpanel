@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ensureAccountForUser } from "@/lib/auth/ensure-account";
+import { sendWelcomeEmailOnce } from "@/lib/email/welcome";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -20,6 +21,7 @@ export async function GET(request: Request) {
 
     if (!error && data.user) {
       await ensureAccountForUser(data.user);
+      if (next !== "/nova-senha") await sendWelcomeEmailOnce(data.user.id);
       return NextResponse.redirect(`${origin}${next}`);
     }
 

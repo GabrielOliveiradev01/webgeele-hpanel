@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_PATHS = [
   "/login",
   "/cadastro",
+  "/recuperar-senha",
   "/auth/callback",
   "/auth/confirm",
   "/api/webhooks/asaas",
