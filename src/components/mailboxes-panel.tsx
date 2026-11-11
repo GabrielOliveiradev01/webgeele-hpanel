@@ -41,13 +41,39 @@ export function MailboxesPanel({
   entitlement,
   domains,
   webmailUrl,
+  admins: initialAdmins = {},
+  adminsEnabled = false,
+  adminsError = null,
 }: {
   mailboxes: Mailbox[];
   entitlement: Entitlement;
   domains: string[];
   webmailUrl: string;
+  admins?: Record<string, string[]>;
+  adminsEnabled?: boolean;
+  adminsError?: string | null;
 }) {
   const router = useRouter();
+  const [admins, setAdmins] = useState(initialAdmins);
+  const [savingAdmin, setSavingAdmin] = useState<string | null>(null);
+  const [adminError, setAdminError] = useState<string | null>(adminsError);
+
+  async function toggleAdmin(email: string, admin: boolean) {
+    setSavingAdmin(email);
+    setAdminError(null);
+    const response = await fetch("/api/mailboxes/admins", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, admin }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    setSavingAdmin(null);
+    if (!response.ok) {
+      setAdminError(payload.error || "Não foi possível salvar o admin");
+      return;
+    }
+    setAdmins((prev) => ({ ...prev, [payload.domain]: payload.admins }));
+  }
   const [buyOpen, setBuyOpen] = useState(false);
   const [localPart, setLocalPart] = useState("");
   const [domain, setDomain] = useState(domains[0] ?? "");
@@ -254,6 +280,8 @@ export function MailboxesPanel({
         </p>
       ) : null}
 
+      {adminError ? <p className="wg-alert-error">{adminError}</p> : null}
+
       <div className="overflow-hidden wg-card">
         <table className="w-full text-left text-sm">
           <thead className="wg-table-head">
@@ -261,12 +289,17 @@ export function MailboxesPanel({
               <th className="px-4 py-3 font-medium">E-mail</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Armazenamento</th>
+              {adminsEnabled ? (
+                <th className="px-4 py-3 font-medium" title="Edita o perfil da empresa no webmail">
+                  Admin da empresa
+                </th>
+              ) : null}
             </tr>
           </thead>
           <tbody>
             {mailboxes.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-wg-text-muted">
+                <td colSpan={adminsEnabled ? 4 : 3} className="px-4 py-8 text-center text-wg-text-muted">
                   Nenhuma caixa ainda.
                 </td>
               </tr>
@@ -282,6 +315,28 @@ export function MailboxesPanel({
                       ? `${(mailbox.quota_mb / 1024).toFixed(0)} GB`
                       : "—"}
                   </td>
+                  {adminsEnabled ? (
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const domain = mailbox.email.split("@")[1] ?? "";
+                        const isAdmin = (admins[domain] ?? []).includes(mailbox.email.toLowerCase());
+                        return (
+                          <label className="inline-flex cursor-pointer items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={isAdmin}
+                              disabled={savingAdmin !== null}
+                              onChange={(e) => void toggleAdmin(mailbox.email, e.target.checked)}
+                              className="h-4 w-4 accent-current"
+                            />
+                            <span className={isAdmin ? "font-medium text-wg-graphite" : "text-wg-text-muted"}>
+                              {savingAdmin === mailbox.email ? "Salvando..." : isAdmin ? "Admin" : "—"}
+                            </span>
+                          </label>
+                        );
+                      })()}
+                    </td>
+                  ) : null}
                 </tr>
               ))
             )}

@@ -13,6 +13,14 @@ function resolver() {
 
 const clean = (value: string) => value.toLowerCase().replace(/\.$/, "").replace(/\s+/g, " ").trim();
 
+function hostName(name: string, domain: string) {
+  const host = clean(name);
+  const apex = clean(domain);
+  if (!host || host === "@" || host === apex) return apex;
+  if (host.endsWith(`.${apex}`)) return host;
+  return `${host}.${apex}`;
+}
+
 async function txt(r: Resolver, host: string) {
   try {
     return (await r.resolveTxt(host)).map((parts) => parts.join(""));
@@ -79,6 +87,17 @@ export async function checkDomainDns(accountId: string, domainId: string) {
     } else if (row.check === "dmarc") {
       const found = await txt(r, `_dmarc.${domain.name}`);
       results[row.key] = found.some((v) => clean(v).startsWith("v=dmarc1")) ? "ok" : "missing";
+    } else if (row.check === "cname") {
+      results[row.key] = await checkCname(r, hostName(row.name, domain.name), expected);
+    } else if (row.check === "srv") {
+      results[row.key] = await checkSrv(r, hostName(row.name, domain.name), expected);
+    } else if (row.check === "txt") {
+      const found = await txt(r, hostName(row.name, domain.name));
+      results[row.key] = !found.length
+        ? "missing"
+        : found.some((value) => clean(value).includes(expected))
+          ? "ok"
+          : "wrong";
     }
   }
 
@@ -93,4 +112,45 @@ export async function checkDomainDns(accountId: string, domainId: string) {
   }
 
   return { results, ready, status, checkedAt: new Date().toISOString() };
+}
+
+async function checkCname(r: Resolver, host: string, expected: string): Promise<CheckResult> {
+  try {
+    const found = (await r.resolveCname(host)).map(clean);
+    if (!found.length) return "missing";
+    return found.includes(expected) ? "ok" : "wrong";
+  } catch (error) {
+    const code = (error as { code?: string }).code;
+    if (code !== "ENODATA" && code !== "ENOTFOUND") return "missing";
+    const ips = await r.resolve4(host).catch(() => [] as string[]);
+    if (!ips.length) return "missing";
+    const expectedIps = await r.resolve4(expected).catch(() => [] as string[]);
+    return ips.some((ip) => expectedIps.includes(ip)) ? "ok" : "wrong";
+  }
+}
+
+async function checkSrv(r: Resolver, host: string, expected: string): Promise<CheckResult> {
+  let found: Array<{ priority: number; weight: number; port: number; name: string }> = [];
+  try {
+    found = await r.resolveSrv(host);
+  } catch {
+    return "missing";
+  }
+  if (!found.length) return "missing";
+
+  const parts = expected.split(" ");
+  if (parts.length < 4) {
+    return found.some((item) => clean(item.name) === expected) ? "ok" : "wrong";
+  }
+
+  const [priority, weight, port, ...target] = parts;
+  const name = clean(target.join(" "));
+  const match = found.some(
+    (item) =>
+      String(item.priority) === priority &&
+      String(item.weight) === weight &&
+      String(item.port) === port &&
+      clean(item.name) === name,
+  );
+  return match ? "ok" : "wrong";
 }

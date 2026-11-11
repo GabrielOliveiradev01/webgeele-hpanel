@@ -11,14 +11,14 @@ export type DnsRecordInput = {
   priority: number | null;
 };
 
-export type DnsCheck = "spf" | "mx" | "dkim" | "dmarc";
+export type DnsCheck = "spf" | "mx" | "dkim" | "dmarc" | "cname" | "srv" | "txt";
 
 export type DnsGuideRow = DnsRecordInput & {
   key: string;
   level: DnsLevel;
   title: string;
   help: string;
-  /** Qual verificação ao vivo vale para este registro (só obrigatórios e recomendados). */
+  /** Qual verificação ao vivo vale para este registro, inclusive os opcionais. */
   check?: DnsCheck;
   /** Campos separados para o formulário de SRV dos provedores. */
   srv?: { priority: string; weight: string; port: string; target: string };
@@ -83,26 +83,36 @@ function classify(row: DnsRecordInput): Omit<DnsGuideRow, keyof DnsRecordInput |
       level: "optional",
       title: "Configuração automática de aplicativos (SRV)",
       help: "No provedor, preencha prioridade, peso, porta e destino separadamente.",
+      check: "srv",
     };
   }
-  if (type === "CNAME" && (name === "autoconfig" || name === "autodiscover")) {
+  if (type === "CNAME") {
     return {
       level: "optional",
-      title: name === "autodiscover" ? "Configuração automática do Outlook" : "Configuração automática (Thunderbird e outros)",
-      help: "Deixa o aplicativo descobrir o servidor sozinho.",
-    };
-  }
-  if (type === "CNAME" && name === "mail") {
-    return {
-      level: "optional",
-      title: "Atalho mail.seudominio",
-      help: "Só crie se ainda não existir um registro mail no domínio.",
+      title:
+        name === "autodiscover"
+          ? "Configuração automática do Outlook"
+          : name === "autoconfig"
+            ? "Configuração automática (Thunderbird e outros)"
+            : name === "mail"
+              ? "Atalho mail.seudominio"
+              : "Registro complementar (CNAME)",
+      help:
+        name === "mail"
+          ? "Só crie se ainda não existir um registro mail no domínio."
+          : "Deixa o aplicativo descobrir o servidor sozinho.",
+      check: "cname",
     };
   }
   return {
     level: "optional",
-    title: name.includes("mta-sts") ? "Segurança no transporte (MTA-STS)" : name.includes("_smtp._tls") ? "Relatórios de entrega (TLS-RPT)" : "Registro complementar",
+    title: name.includes("mta-sts")
+      ? "Segurança no transporte (MTA-STS)"
+      : name.includes("_smtp._tls")
+        ? "Relatórios de entrega (TLS-RPT)"
+        : "Registro complementar",
     help: "Opcional. Pode deixar para depois.",
+    check: type === "TXT" ? "txt" : undefined,
   };
 }
 

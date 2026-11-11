@@ -15,28 +15,17 @@ export default async function ServicosPage() {
   const mailboxes = account ? await listAccountMailboxes(account.id) : [];
   const domains = account ? await listDomains(account.id) : [];
 
+  const bought = entitlement?.maxMailboxes ?? 0;
   const services = [
-    entitlement?.planName
-      ? {
-          name: "Plano WebGeele",
-          detail: entitlement.planName,
-          status: "Ativo",
-          href: "/plano",
-        }
-      : null,
-    mailboxes.length
-      ? {
-          name: "Caixas de e-mail",
-          detail: `${mailboxes.length} / ${entitlement?.maxMailboxes ?? 0} caixas`,
-          status: "Ativo",
-          href: "/caixas",
-        }
-      : {
-          name: "Caixas de e-mail",
-          detail: "Nenhuma caixa criada",
-          status: "—",
-          href: "/caixas",
-        },
+    {
+      name: "Caixas de e-mail",
+      detail:
+        bought > 0
+          ? `${mailboxes.length} ${mailboxes.length === 1 ? "criada" : "criadas"} · ${bought} ${bought === 1 ? "contratada" : "contratadas"}`
+          : "Nenhuma caixa contratada",
+      status: bought > 0 ? "Ativo" : "—",
+      href: "/caixas",
+    },
     domains.length
       ? {
           name: "Domínios",
@@ -61,7 +50,7 @@ export default async function ServicosPage() {
     <div>
       <PageHeader
         title="Meus serviços"
-        description="Resumo dos serviços contratados e status operacional da conta."
+        description="Caixas de e-mail compradas e domínios da conta."
       />
       <div className="grid gap-4 md:grid-cols-2">
         {services.map((service) => (

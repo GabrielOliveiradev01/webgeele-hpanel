@@ -130,14 +130,23 @@ export function DnsGuide({
         setMessage({ tone: "error", text: payload.error || "Não foi possível verificar agora." });
         return;
       }
-      setResults(payload.results ?? {});
+      const nextResults = (payload.results ?? {}) as Record<string, CheckResult>;
+      setResults(nextResults);
       onStatusChange?.(payload.status);
+      const optionalPending = rows.filter(
+        (row) => row.level === "optional" && row.check && nextResults[row.key] !== "ok",
+      );
       setMessage(
         payload.ready
-          ? { tone: "ok", text: "Tudo certo! Os registros obrigatórios estão configurados e o domínio está ativo." }
+          ? optionalPending.length
+            ? {
+                tone: "warn",
+                text: "Os obrigatórios estão configurados e o domínio está ativo. Alguns opcionais ainda não aparecem no DNS.",
+              }
+            : { tone: "ok", text: "Tudo certo. Obrigatórios e opcionais estão configurados, e o domínio está ativo." }
           : {
               tone: "warn",
-              text: "Ainda faltam registros obrigatórios. Depois de salvar no provedor, a propagação pode levar de alguns minutos a algumas horas.",
+              text: "Ainda faltam registros obrigatórios. Os opcionais também foram conferidos. Depois de salvar no provedor, a propagação pode levar de alguns minutos a algumas horas.",
             },
       );
     } catch {
@@ -199,17 +208,19 @@ export function DnsGuide({
       )}
 
       {byLevel("optional").length ? (
-        <details className="group rounded-xl border border-dashed border-wg-border p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-wg-graphite">
-            {LEVELS.optional.label} ({byLevel("optional").length})
-            <span className="ml-2 text-xs font-normal text-wg-text-muted">{LEVELS.optional.description}</span>
-          </summary>
+        <section>
+          <h3 className="font-display text-sm font-semibold text-wg-graphite">
+            {LEVELS.optional.label}
+            <span className="ml-2 font-sans text-xs font-normal text-wg-text-muted">
+              {LEVELS.optional.description}
+            </span>
+          </h3>
           <div className="mt-3 space-y-3">
             {byLevel("optional").map((row) => (
-              <RecordCard key={row.key} row={row} />
+              <RecordCard key={row.key} row={row} result={results[row.key]} />
             ))}
           </div>
-        </details>
+        </section>
       ) : null}
     </div>
   );

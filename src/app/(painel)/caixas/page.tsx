@@ -7,6 +7,7 @@ import { createStalwartClient } from "@/lib/stalwart/client";
 import { PageHeader } from "@/components/page-header";
 import { MailboxesPanel } from "@/components/mailboxes-panel";
 import { env } from "@/lib/env";
+import { listDomainAdmins, webmailAdminsEnabled } from "@/lib/webmail/admins";
 
 export const metadata: Metadata = {
   title: "Caixas de entrada",
@@ -43,6 +44,17 @@ export default async function CaixasPage() {
     }
   }
 
+  let admins: Record<string, string[]> = {};
+  let adminsError: string | null = null;
+  const adminsEnabled = webmailAdminsEnabled();
+  if (adminsEnabled && mailboxes.length) {
+    try {
+      admins = await listDomainAdmins(mailboxes.map((mailbox) => mailbox.email.split("@")[1]));
+    } catch (error) {
+      adminsError = error instanceof Error ? error.message : "Falha ao ler admins do webmail";
+    }
+  }
+
   return (
     <div>
       <PageHeader
@@ -68,6 +80,9 @@ export default async function CaixasPage() {
         }
         domains={domains}
         webmailUrl={env.webmailUrl()}
+        admins={admins}
+        adminsEnabled={adminsEnabled}
+        adminsError={adminsError}
       />
     </div>
   );
