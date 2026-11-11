@@ -9,6 +9,7 @@ const MESSAGES: Array<[RegExp, string]> = [
   [/(expired|invalid).*(link|token|otp)|(otp|token).*(expired|invalid)/i, "Este link expirou ou já foi usado. Peça um novo."],
   [/auth session missing/i, "Sua sessão expirou. Peça um novo link de redefinição."],
   [/unable to validate email|invalid email/i, "Informe um e-mail válido."],
+  [/error sending confirmation email/i, "Não conseguimos enviar o e-mail de confirmação. Tente de novo em instantes."],
 ];
 
 export function authErrorMessage(message: string | null | undefined) {

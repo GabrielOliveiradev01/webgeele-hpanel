@@ -22,7 +22,11 @@ export async function GET(request: Request) {
     if (!error && data.user) {
       await ensureAccountForUser(data.user);
       if (next !== "/nova-senha") await sendWelcomeEmailOnce(data.user.id);
-      return NextResponse.redirect(`${origin}${next}`);
+      const destination =
+        next === "/nova-senha"
+          ? next
+          : `${next}${next.includes("?") ? "&" : "?"}confirmado=1`;
+      return NextResponse.redirect(`${origin}${destination}`);
     }
 
     return NextResponse.redirect(

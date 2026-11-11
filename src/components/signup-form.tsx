@@ -3,8 +3,8 @@
 import { startingPriceLabel } from "@/lib/site";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Globe, Mail, MailCheck, User } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { authErrorMessage } from "@/lib/auth/messages";
 import {
   AuthError,
@@ -27,47 +27,39 @@ function passwordStrength(password: string) {
 }
 
 export function SignupForm() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const origin = window.location.origin;
-
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/callback`,
-        data: {
-          full_name: name,
-          legal_name: name,
-        },
-      },
+    const normalizedEmail = email.trim().toLowerCase();
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email: normalizedEmail, password }),
     });
+    const payload = (await response.json()) as { status?: string; error?: string };
+    const query = `email=${encodeURIComponent(normalizedEmail)}`;
 
-    setLoading(false);
-
-    if (signUpError) {
-      setError(authErrorMessage(signUpError.message));
+    if (!response.ok) {
+      setLoading(false);
+      setError(authErrorMessage(payload.error));
       return;
     }
 
-    // Se o projeto confirmar automaticamente (não é o nosso caso), já haveria sessão.
-    if (data.session) {
-      window.location.href = "/";
+    if (payload.status === "exists") {
+      router.push(`/cadastro/ja-existe?${query}`);
       return;
     }
 
-    setSent(true);
+    router.push(`/cadastro/enviado?${query}`);
   }
 
   const strength = passwordStrength(password);
@@ -83,113 +75,84 @@ export function SignupForm() {
         </BrandPanel>
       }
     >
-      {sent ? (
-        <div className="animate-fade-up">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-wg-brand/10 text-wg-brand">
-            <MailCheck className="h-7 w-7" />
-          </span>
-          <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight text-wg-graphite">
-            Confirme seu e-mail
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-wg-text-muted">
-            Enviamos um link de confirmação para{" "}
-            <strong className="text-wg-graphite">{email}</strong>. Abra o e-mail e
-            clique no link para ativar o acesso ao painel.
-          </p>
-          <p className="mt-4 rounded-xl bg-wg-surface px-4 py-3 text-sm text-wg-text-muted">
-            Não recebeu? Verifique a caixa de spam ou promoções.
-          </p>
-          <Link href="/login" className={`${authButtonClass} mt-8`}>
-            Ir para o login
+      <h1 className="animate-fade-up font-display text-3xl font-semibold tracking-tight text-wg-graphite">
+        Crie sua conta
+      </h1>
+      <p className="animate-fade-up-delay-1 mt-2 text-sm text-wg-text-muted">
+        Conta individual: um usuário por painel, sem acesso compartilhado.
+      </p>
+
+      <form onSubmit={onSubmit} className="animate-fade-up-delay-2 mt-10 space-y-5">
+        <AuthField
+          label="Nome"
+          icon={User}
+          type="text"
+          required
+          autoComplete="name"
+          placeholder="Seu nome ou razão social"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+
+        <AuthField
+          label="E-mail"
+          icon={Mail}
+          type="email"
+          required
+          autoComplete="email"
+          placeholder="voce@suaempresa.com.br"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+
+        <PasswordField
+          required
+          minLength={8}
+          autoComplete="new-password"
+          placeholder="Mínimo de 8 caracteres"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          hint={
+            password ? (
+              <span className="flex items-center gap-3">
+                <span className="grid flex-1 grid-cols-3 gap-1.5">
+                  {[1, 2, 3].map((level) => (
+                    <span
+                      key={level}
+                      className={`h-1.5 rounded-full transition ${
+                        level <= strength ? strengthColors[strength] : "bg-wg-border"
+                      }`}
+                    />
+                  ))}
+                </span>
+                <span className="w-20 text-right text-xs text-wg-text-muted">
+                  {password.length < 8 ? strengthLabels[0] : strengthLabels[strength]}
+                </span>
+              </span>
+            ) : (
+              <span className="text-xs text-wg-text-muted">
+                Use letras maiúsculas, números e símbolos.
+              </span>
+            )
+          }
+        />
+
+        <AuthError message={error} />
+
+        <button type="submit" disabled={loading} className={authButtonClass}>
+          {loading ? "Criando conta..." : "Criar conta"}
+          {!loading ? (
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-          </Link>
-        </div>
-      ) : (
-        <>
-          <h1 className="animate-fade-up font-display text-3xl font-semibold tracking-tight text-wg-graphite">
-            Crie sua conta
-          </h1>
-          <p className="animate-fade-up-delay-1 mt-2 text-sm text-wg-text-muted">
-            Conta individual: um usuário por painel, sem acesso compartilhado.
-          </p>
+          ) : null}
+        </button>
+      </form>
 
-          <form onSubmit={onSubmit} className="animate-fade-up-delay-2 mt-10 space-y-5">
-            <AuthField
-              label="Nome"
-              icon={User}
-              type="text"
-              required
-              autoComplete="name"
-              placeholder="Seu nome ou razão social"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-
-            <AuthField
-              label="E-mail"
-              icon={Mail}
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="voce@suaempresa.com.br"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-
-            <PasswordField
-              required
-              minLength={8}
-              autoComplete="new-password"
-              placeholder="Mínimo de 8 caracteres"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              hint={
-                password ? (
-                  <span className="flex items-center gap-3">
-                    <span className="grid flex-1 grid-cols-3 gap-1.5">
-                      {[1, 2, 3].map((level) => (
-                        <span
-                          key={level}
-                          className={`h-1.5 rounded-full transition ${
-                            level <= strength
-                              ? strengthColors[strength]
-                              : "bg-wg-border"
-                          }`}
-                        />
-                      ))}
-                    </span>
-                    <span className="w-20 text-right text-xs text-wg-text-muted">
-                      {password.length < 8
-                        ? strengthLabels[0]
-                        : strengthLabels[strength]}
-                    </span>
-                  </span>
-                ) : (
-                  <span className="text-xs text-wg-text-muted">
-                    Use letras maiúsculas, números e símbolos.
-                  </span>
-                )
-              }
-            />
-
-            <AuthError message={error} />
-
-            <button type="submit" disabled={loading} className={authButtonClass}>
-              {loading ? "Criando conta..." : "Criar conta"}
-              {!loading ? (
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              ) : null}
-            </button>
-          </form>
-
-          <p className="animate-fade-up-delay-3 mt-8 text-center text-sm text-wg-text-muted">
-            Já tem conta?{" "}
-            <Link href="/login" className="font-semibold text-wg-brand hover:underline">
-              Entrar
-            </Link>
-          </p>
-        </>
-      )}
+      <p className="animate-fade-up-delay-3 mt-8 text-center text-sm text-wg-text-muted">
+        Já tem conta?{" "}
+        <Link href="/login" className="font-semibold text-wg-brand hover:underline">
+          Entrar
+        </Link>
+      </p>
     </AuthShell>
   );
 }

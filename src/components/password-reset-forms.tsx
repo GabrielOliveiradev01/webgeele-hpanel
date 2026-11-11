@@ -78,6 +78,13 @@ export function ForgotPasswordForm() {
           >
             Enviar para outro e-mail
           </button>
+          <Link
+            href="/login?email=redefinicao"
+            className={`${authButtonClass} mt-6`}
+          >
+            Voltar ao login
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       ) : (
         <>

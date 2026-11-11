@@ -3,12 +3,13 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, CheckCircle2, Globe, Mail } from "lucide-react";
+import { ArrowRight, CheckCircle2, Globe, Mail, MailCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { authErrorMessage } from "@/lib/auth/messages";
 import {
   AuthError,
   AuthField,
+  AuthNotice,
   AuthShell,
   BrandPanel,
   PasswordField,
@@ -21,33 +22,99 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [noticeTone, setNoticeTone] = useState<"info" | "success">("info");
+  const [needsConfirm, setNeedsConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
     const paramError = searchParams.get("error");
-    if (paramError) setError(authErrorMessage(paramError));
+    if (paramError) {
+      setError(authErrorMessage(paramError));
+      if (/email not confirmed|confirm/i.test(paramError)) {
+        setNeedsConfirm(true);
+      }
+    }
+
+    const sent = searchParams.get("email");
+    if (sent === "enviado") {
+      setNoticeTone("success");
+      setNotice(
+        "Enviamos um e-mail de confirmação. Abra a mensagem da WebGeele e clique no link para ativar sua conta.",
+      );
+    } else if (sent === "redefinicao") {
+      setNoticeTone("success");
+      setNotice(
+        "Se o e-mail existir na WebGeele, enviamos um link para redefinir a senha. Confira a caixa de entrada e o spam.",
+      );
+    } else if (searchParams.get("confirmado") === "1") {
+      setNoticeTone("success");
+      setNotice("E-mail confirmado. Agora você já pode entrar no painel.");
+    }
   }, [searchParams]);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
     setError(null);
+    setNeedsConfirm(false);
 
     const supabase = createClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
 
     setLoading(false);
 
     if (signInError) {
-      setError(authErrorMessage(signInError.message));
+      const message = authErrorMessage(signInError.message);
+      setError(message);
+      if (/email not confirmed/i.test(signInError.message)) {
+        setNeedsConfirm(true);
+        setNoticeTone("info");
+        setNotice(
+          "Sua conta ainda não foi ativada. Vamos enviar um novo e-mail de confirmação se você pedir abaixo.",
+        );
+      }
       return;
     }
 
     router.replace(searchParams.get("next") || "/");
     router.refresh();
+  }
+
+  async function resendConfirmation() {
+    const target = email.trim();
+    if (!target) {
+      setError("Informe o e-mail da conta para reenviarmos a confirmação.");
+      return;
+    }
+
+    setResending(true);
+    setError(null);
+    setNoticeTone("info");
+    setNotice(`Enviando e-mail de confirmação para ${target}…`);
+
+    const response = await fetch("/api/auth/resend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: target }),
+    });
+    const payload = (await response.json()) as { error?: string };
+    setResending(false);
+
+    if (!response.ok) {
+      setNotice(null);
+      setError(authErrorMessage(payload.error));
+      return;
+    }
+
+    setNoticeTone("success");
+    setNotice(
+      `Enviamos um novo e-mail de confirmação para ${target}. Abra a mensagem e clique no link. Não chegou? Veja spam ou promoções.`,
+    );
   }
 
   return (
@@ -94,7 +161,27 @@ export function LoginForm() {
           </Link>
         </div>
 
+        <AuthNotice message={notice} tone={noticeTone} />
         <AuthError message={error} />
+
+        {needsConfirm ? (
+          <div className="rounded-xl border border-wg-border bg-wg-surface px-4 py-3">
+            <p className="flex items-start gap-2 text-sm text-wg-graphite">
+              <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-wg-brand" />
+              <span>
+                Ao reenviar, a WebGeele manda um link de ativação para o e-mail informado acima.
+              </span>
+            </p>
+            <button
+              type="button"
+              disabled={resending || !email.trim()}
+              onClick={resendConfirmation}
+              className="mt-3 text-sm font-semibold text-wg-brand hover:underline disabled:opacity-50"
+            >
+              {resending ? "Enviando e-mail…" : "Reenviar e-mail de confirmação"}
+            </button>
+          </div>
+        ) : null}
 
         <button type="submit" disabled={loading} className={authButtonClass}>
           {loading ? "Entrando..." : "Entrar no painel"}

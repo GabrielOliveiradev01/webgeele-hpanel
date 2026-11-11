@@ -101,6 +101,25 @@ export function AuthError({ message }: { message: string | null }) {
   );
 }
 
+export function AuthNotice({
+  message,
+  tone = "info",
+}: {
+  message: string | null;
+  tone?: "info" | "success";
+}) {
+  if (!message) return null;
+  const styles =
+    tone === "success"
+      ? "border-emerald-100 bg-emerald-50 text-emerald-800"
+      : "border-wg-brand/15 bg-wg-brand/[0.06] text-wg-graphite";
+  return (
+    <p className={`rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed ${styles}`}>
+      {message}
+    </p>
+  );
+}
+
 export function BrandPanel({
   title,
   description,

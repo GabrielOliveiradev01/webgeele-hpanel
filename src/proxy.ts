@@ -8,6 +8,8 @@ const PUBLIC_PATHS = [
   "/auth/callback",
   "/auth/confirm",
   "/api/webhooks/asaas",
+  "/api/auth/signup",
+  "/api/auth/resend",
   // Arquivos de SEO: o Google precisa lê-los sem login.
   "/robots.txt",
   "/sitemap.xml",
