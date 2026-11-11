@@ -33,6 +33,23 @@ const BLOCK_PERMISSIONS = [
   "email-receive",
 ] as const;
 
+export function disabledPermissionsFor(mailbox: {
+  status: string;
+  mail_blocked: boolean;
+  access_blocked: boolean;
+  access_paused: boolean;
+}) {
+  const billingBlocked = mailbox.status === "blocked";
+  const permissions: string[] = [];
+  if (billingBlocked || mailbox.access_blocked || mailbox.access_paused) {
+    permissions.push("authenticate");
+  }
+  if (billingBlocked || mailbox.mail_blocked) {
+    permissions.push("email-send", "email-receive");
+  }
+  return permissions;
+}
+
 function stalwartConfigured() {
   return Boolean(
     env.stalwartApiUrl() && env.stalwartApiUser() && env.stalwartApiPassword(),
@@ -158,7 +175,11 @@ export function createStalwartClient() {
 
     async patchPrincipal(
       name: string,
-      actions: Array<{ action: string; field: string; value: string | number | boolean }>,
+      actions: Array<{
+        action: string;
+        field: string;
+        value: string | number | boolean | string[];
+      }>,
     ) {
       return stalwartFetch<{ data: null }>(
         `/api/principal/${encodeURIComponent(name)}`,
@@ -169,26 +190,52 @@ export function createStalwartClient() {
       );
     },
 
-    async setMailboxBlocked(email: string, blocked: boolean) {
-      if (blocked) {
-        await this.patchPrincipal(
-          email,
-          BLOCK_PERMISSIONS.map((permission) => ({
+    async setDisabledPermissions(email: string, wanted: string[]) {
+      let current: string[] = [];
+      try {
+        const principal = await this.getPrincipal(email);
+        current = principal.data?.disabledPermissions ?? [];
+      } catch {
+        current = [];
+      }
+
+      const actions: Array<{
+        action: string;
+        field: string;
+        value: string;
+      }> = [];
+
+      for (const permission of BLOCK_PERMISSIONS) {
+        const has = current.includes(permission);
+        const need = wanted.includes(permission);
+        if (need && !has) {
+          actions.push({
             action: "addItem",
             field: "disabledPermissions",
             value: permission,
-          })),
-        );
-      } else {
-        await this.patchPrincipal(
-          email,
-          BLOCK_PERMISSIONS.map((permission) => ({
+          });
+        }
+        if (!need && has) {
+          actions.push({
             action: "removeItem",
             field: "disabledPermissions",
             value: permission,
-          })),
-        );
+          });
+        }
       }
+
+      if (actions.length === 0) return;
+      await this.patchPrincipal(email, actions);
+    },
+
+    async setMailboxBlocked(email: string, blocked: boolean) {
+      await this.setDisabledPermissions(email, blocked ? [...BLOCK_PERMISSIONS] : []);
+    },
+
+    async setMailboxPassword(email: string, password: string) {
+      await this.patchPrincipal(email, [
+        { action: "set", field: "secrets", value: [password] },
+      ]);
     },
 
     deleteMailbox(email: string) {
@@ -229,7 +276,9 @@ export async function setAccountMailboxesBlocked(
 
   const { data: mailboxes, error } = await admin
     .from("mailboxes")
-    .select("id, email, stalwart_account_id, status")
+    .select(
+      "id, email, stalwart_account_id, status, mail_blocked, access_blocked, access_paused",
+    )
     .eq("account_id", accountId)
     .neq("status", "deleted");
 
@@ -238,21 +287,28 @@ export async function setAccountMailboxesBlocked(
   for (const mailbox of mailboxes ?? []) {
     const principalName = mailbox.stalwart_account_id || mailbox.email;
 
+    const nextStatus = blocked ? "blocked" : "active";
+    await admin
+      .from("mailboxes")
+      .update({
+        status: nextStatus,
+        blocked_reason: null,
+      })
+      .eq("id", mailbox.id);
+
     if (client.configured() && principalName) {
+      const wanted = disabledPermissionsFor({
+        status: nextStatus,
+        mail_blocked: Boolean(mailbox.mail_blocked),
+        access_blocked: Boolean(mailbox.access_blocked),
+        access_paused: Boolean(mailbox.access_paused),
+      });
       try {
-        await client.setMailboxBlocked(principalName, blocked);
+        await client.setDisabledPermissions(principalName, wanted);
       } catch (error) {
         console.error("Stalwart block sync failed", mailbox.email, error);
       }
     }
-
-    await admin
-      .from("mailboxes")
-      .update({
-        status: blocked ? "blocked" : "active",
-        blocked_reason: null,
-      })
-      .eq("id", mailbox.id);
   }
 
   return { count: mailboxes?.length ?? 0, blocked };

@@ -18,6 +18,8 @@ const statusMap: Record<string, { label: string; tone: keyof typeof tones }> = {
   cancelled: { label: "Cancelado", tone: "neutral" },
   inactive: { label: "Inativo", tone: "neutral" },
   suspended: { label: "Suspenso", tone: "danger" },
+  blocked: { label: "Bloqueada", tone: "danger" },
+  paused: { label: "Acesso pausado", tone: "warning" },
 };
 
 const tones = {

@@ -15,7 +15,9 @@ export async function listAccountMailboxes(accountId: string) {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("mailboxes")
-    .select("id, email, status, blocked_reason, quota_mb, stalwart_account_id, created_at")
+    .select(
+      "id, email, status, blocked_reason, quota_mb, stalwart_account_id, created_at, domain_id, mail_blocked, access_blocked, access_paused, is_domain_admin, domain:domains(name)",
+    )
     .eq("account_id", accountId)
     .neq("status", "deleted")
     .order("created_at", { ascending: true });
@@ -134,6 +136,18 @@ export async function createMailboxForAccount(input: {
     .single();
 
   if (error) throw error;
+
+  const { count } = await admin
+    .from("mailboxes")
+    .select("id", { count: "exact", head: true })
+    .eq("domain_id", accountDomain.id)
+    .eq("is_domain_admin", true)
+    .neq("status", "deleted")
+    .neq("id", mailbox.id);
+
+  if (!count) {
+    await admin.from("mailboxes").update({ is_domain_admin: true }).eq("id", mailbox.id);
+  }
 
   return {
     mailbox,

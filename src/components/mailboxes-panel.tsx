@@ -5,12 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRightLeft } from "lucide-react";
 import { BuyMailboxModal } from "@/components/buy-mailbox-modal";
+import { StatusBadge } from "@/components/status-badge";
 type Mailbox = {
   id: string;
   email: string;
   status: string;
   blocked_reason: string | null;
   quota_mb: number | null;
+  mail_blocked?: boolean;
+  access_blocked?: boolean;
+  access_paused?: boolean;
 };
 
 type Entitlement = {
@@ -24,6 +28,13 @@ type Entitlement = {
   maxStorageMb?: number;
   mailboxSlots?: Record<string, number>;
 } | null;
+
+function mailboxStatus(mailbox: Mailbox) {
+  if (mailbox.status === "blocked") return "blocked";
+  if (mailbox.access_paused) return "paused";
+  if (mailbox.access_blocked || mailbox.mail_blocked) return "blocked";
+  return "active";
+}
 
 export function MailboxesPanel({
   mailboxes,
@@ -263,7 +274,9 @@ export function MailboxesPanel({
               mailboxes.map((mailbox) => (
                 <tr key={mailbox.id} className="border-b border-wg-border/60 last:border-0">
                   <td className="px-4 py-3 font-medium text-wg-graphite">{mailbox.email}</td>
-                  <td className="px-4 py-3">Ativo</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={mailboxStatus(mailbox)} />
+                  </td>
                   <td className="px-4 py-3">
                     {mailbox.quota_mb
                       ? `${(mailbox.quota_mb / 1024).toFixed(0)} GB`
